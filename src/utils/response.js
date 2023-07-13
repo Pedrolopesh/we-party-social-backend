@@ -1,4 +1,4 @@
-export const response = (res, statusCode, resBody) => {
+const response = (res, statusCode, resBody) => {
     return res.status(statusCode).send(resBody)
 }
 

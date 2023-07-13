@@ -1,7 +1,6 @@
 const User = require('../database/models/User');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const authConfig = require('../config/auth.json');
 const cloudinary = require('cloudinary').v2;
 const webpush = require('web-push');
 const nodemailer = require('nodemailer');
@@ -20,9 +19,10 @@ module.exports = {
             return response(res, 400, { success: false, message: 'Please fill in all fields' })
         }
 
-        User.findOne({ email:email }).then(user => {
+        User.findOne({ email:email })
+        .then(user => {
             if(user){
-                res.status(200).send({ success:false, message:"User Alredy exist" })
+                return response(res, 401, { success: false, message: 'User Alredy exist' })
             }
             else{
                 const newUser = new User({
@@ -84,12 +84,10 @@ module.exports = {
                     //GENERATE TOKEN SESSION AND RETURN WITH USE ID
                     else{
                         function generateToken(params={}){
-                            return jwt.sign(params, authConfig.secret,{
+                            return jwt.sign(params, process.env.AUTH_SECRET,{
                                 expiresIn: 2155926
                             })
                         }
-                        console.log("User success logedin")
-                        console.log(user._id)
                         return res.status(200).json({ success: true, user_id: user._id, token: generateToken({ id: user.id }) })
                     }
                 })
@@ -335,7 +333,7 @@ module.exports = {
             if(updatedUser){
 
                 function generateToken(params={}){
-                    return jwt.sign(params, authConfig.secret, {
+                    return jwt.sign(params, process.env.AUTH_SECRET, {
                         expiresIn: 2155926
                     })
                 }
