@@ -88,7 +88,7 @@ module.exports = {
                                 expiresIn: 2155926
                             })
                         }
-                        return res.status(200).json({ success: true, user_id: user._id, token: generateToken({ id: user.id }) })
+                        return res.status(200).json({ success: true, userId: user._id, token: generateToken({ id: user.id }) })
                     }
                 })
             }
@@ -110,7 +110,7 @@ module.exports = {
         const { name } = req.body
         const userId = req.params.id;
 
-        // const user = await User.findById(data.user_id)
+        //missing check if userId has a valid type
 
         if(!name && !userId){
             return res.send({ message: 'Please fill in all fields'})
@@ -118,11 +118,11 @@ module.exports = {
 
         const locateUser = await User.findById(userId).catch(err => { console.log(err); return res.status(400).json({ success: false, message: "User not found", error: err }) })
 
-        if(!locateUser){console.log(locateUser); return res.status(400).json({ success: false, message: "User not found" })}
+        if(!locateUser){ return res.status(400).json({ success: false, message: "User not found" })}
 
         const userUpdated = await User.findByIdAndUpdate(userId, {
             name,
-        }).catch(err => { console.log(err); return res.send({ success: true, error: 'error on update user', data: err }) })
+        }).catch(err => { console.log(err); return res.send({ success: false, error: 'error on update user', data: err }) })
 
         return res.send({ success: true, message: 'succes on update user', data: userUpdated })
     },
@@ -132,8 +132,6 @@ module.exports = {
 
         const { img_profile } = req.body
         const userId = req.params.id;
-
-        // const user = await User.findById(data.user_id)
 
         if(!img_profile || !userId){
             return res.send({ message: 'Please fill in all fields'})
@@ -153,7 +151,7 @@ module.exports = {
     //ARRUMAR A FUNÇÃO PARA RETORNAR URL DE MANEIRA QUE RESPEITE O AWAIT
     async upLoadUserImage(req, res){
         const file = req.files.photo
-        const user = req.body.user_id
+        const user = req.body.userId
 
         const cloudinaryApi = await cloudinary.uploader.upload(file.tempFilePath).catch(err => {
             return res.send({ sucess: false, error: err })
