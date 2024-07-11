@@ -1,25 +1,17 @@
-.DS_Store
+# FOLDERS ######################################################################
+
 node_modules
-/dist
-/tmp
+coverage
+dist
+ignore
 
+# FILES ########################################################################
 
-# local env files
-.env.local
-.env.*.local
 .env
+TODO.md
+prisma/main/ERD.svg
+prisma/audit/ERD.svg
 
-# Log files
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-
-# Editor directories and files
-.idea
-.vscode
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
+pnpm-lock.yaml
+yarn.lock
+launch.json
