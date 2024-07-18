@@ -38,7 +38,7 @@ export class UserProfileRepository implements IUserProfileRepository {
       .findOne({ email });
 
     if (!userProfile) {
-      throw new Error("User not found");
+      return null;
     }
 
     return {
@@ -53,7 +53,7 @@ export class UserProfileRepository implements IUserProfileRepository {
       .findOne({ _id: new ObjectId(id) });
 
     if (!userProfile) {
-      throw new Error("User not found");
+      return null;
     }
 
     return {

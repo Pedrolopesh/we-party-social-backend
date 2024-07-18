@@ -44,6 +44,8 @@ export interface IUserProfileSearchParams {
 
 export interface ICreatedExternalUser {
   userId: string;
+  token: string;
+  tokenExpiresAt: string;
 }
 
 export interface IUserProfileController {
@@ -61,7 +63,9 @@ export interface IUserProfileController {
 }
 
 export interface IUserProfileRepository {
-  createUserProfile(params: CreateUserProfileParams): Promise<UserProfile>;
+  createUserProfile(
+    params: CreateUserProfileParams<Omit<password>>
+  ): Promise<UserProfile>;
   getAllUserProfiles(params?: IUserProfileSearchParams): Promise<UserProfile[]>;
   findUserProfileById(id: string): Promise<UserProfile | null>;
   findUserProfileByEmail(email: string): Promise<UserProfile | null>;

@@ -14,42 +14,60 @@ export class UserProfileController implements IUserProfileController {
   async createUserProfile(
     httpRequest: HttpRequest<CreateUserProfileParams>
   ): Promise<HttpResponse<UserProfile>> {
-    const { body } = httpRequest;
+    try {
+      const { body } = httpRequest;
 
-    if (!body) {
-      return {
-        status: 400,
-        body: "Body is required",
-      };
-    }
+      if (!body) {
+        return {
+          status: 400,
+          body: "Body is required",
+        };
+      }
 
-    // TO DO: evitar que a senha seja enviada para o repository de userProfile, deve ir somente para o repository de user (verificar com chatgpt como fazer isso seguindo boas praticas e utilizando sanitização)
-    const userProfile = await this.userProfileRepository.createUserProfile(
-      body
-    );
+      const { password, ...mongoBody } = body;
 
-    const createdSqlUser = await requestCreateExternalUser({
-      ...body,
-      mongoUserId: userProfile.id,
-    });
+      const getUser = await this.userProfileRepository.findUserProfileByEmail(
+        mongoBody.email
+      );
 
-    console.log("createdSqlUser =>", createdSqlUser);
+      if (getUser) {
+        return {
+          status: 400,
+          body: "User already exists",
+        };
+      }
 
-    const updatedUserProfile =
+      const userProfile = await this.userProfileRepository.createUserProfile(
+        mongoBody
+      );
+
+      const createdSqlUser = await requestCreateExternalUser({
+        ...body,
+        password,
+        mongoUserId: userProfile.id,
+      });
+
       await this.userProfileRepository.updateUserProfile(userProfile.id, {
         sqlUserId: createdSqlUser.userId,
       });
 
-    const result: any = {
-      userProfile,
-      createdSqlUser,
-      updatedUserProfile,
-    };
+      const result: any = {
+        ...userProfile,
+        token: createdSqlUser.token,
+        tokenExpiresAt: createdSqlUser.tokenExpiresAt,
+      };
 
-    return {
-      status: 201,
-      body: result,
-    };
+      return {
+        status: 201,
+        body: result,
+      };
+    } catch (error: any) {
+      console.log("error", error);
+      return {
+        status: 500,
+        body: error,
+      };
+    }
   }
 
   async deleteUserProfile(

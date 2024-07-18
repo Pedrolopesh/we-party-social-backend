@@ -1,26 +1,30 @@
 import express from "express";
 import { AuthMiddleware } from "../middlewares/auth";
+import { UserProfileValidation } from "../controllers/UserProfileValidation";
 import { UserProfileRepository } from "../database/RepoUserProfile";
 import { UserProfileController } from "../controllers/UserProfileController";
 import { removeMassiveUsers } from "../local-helprs/remove-massive";
 
 const router = express.Router();
 const authMiddleware = new AuthMiddleware();
+const userProfileValidation = new UserProfileValidation();
 
 // ============= PROTECTED ROUTES =============
-router.route("/create").post(async (req, res) => {
-  const mongoUserProfileRepository = new UserProfileRepository();
+router
+  .route("/create")
+  .post(userProfileValidation.userInputValidations, async (req, res) => {
+    const mongoUserProfileRepository = new UserProfileRepository();
 
-  const userProfileController = new UserProfileController(
-    mongoUserProfileRepository
-  );
+    const userProfileController = new UserProfileController(
+      mongoUserProfileRepository
+    );
 
-  const { body, status } = await userProfileController.createUserProfile({
-    body: req.body,
+    const { body, status } = await userProfileController.createUserProfile({
+      body: req.body,
+    });
+
+    res.status(status).send(body);
   });
-
-  res.status(status).send(body);
-});
 
 router.route("/all").get(async (req, res) => {
   const mongoUserProfileRepository = new UserProfileRepository();

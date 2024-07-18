@@ -1,4 +1,4 @@
-export interface ICreateUsersParams {
+export interface ICreateExternalUserParams {
   name: string;
   email: string;
   password: string;
