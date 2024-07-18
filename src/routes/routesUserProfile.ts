@@ -1,13 +1,14 @@
 import express from "express";
 import { AuthMiddleware } from "../middlewares/auth";
 import { UserProfileRepository } from "../database/RepoUserProfile";
-import { UserProfileController } from "../controllers/UserProfile";
+import { UserProfileController } from "../controllers/UserProfileController";
+import { removeMassiveUsers } from "../local-helprs/remove-massive";
 
 const router = express.Router();
 const authMiddleware = new AuthMiddleware();
 
 // ============= PROTECTED ROUTES =============
-router.route("/create").post(authMiddleware.validateToken, async (req, res) => {
+router.route("/create").post(async (req, res) => {
   const mongoUserProfileRepository = new UserProfileRepository();
 
   const userProfileController = new UserProfileController(
@@ -21,16 +22,39 @@ router.route("/create").post(authMiddleware.validateToken, async (req, res) => {
   res.status(status).send(body);
 });
 
-router.route("/all").post(authMiddleware.validateToken, async (req, res) => {
+router.route("/all").get(async (req, res) => {
   const mongoUserProfileRepository = new UserProfileRepository();
 
   const userProfileController = new UserProfileController(
     mongoUserProfileRepository
   );
 
-  const { body, status } = await userProfileController.getUserProfiles();
+  const { body, status } = await userProfileController.getAllUserProfiles({
+    body: req.params,
+  });
 
   res.status(status).send(body);
+});
+
+router.route("/delete/:id").delete(async (req, res) => {
+  const userProfileRepository = new UserProfileRepository();
+
+  const userProfileController = new UserProfileController(
+    userProfileRepository
+  );
+
+  const { body, status } = await userProfileController.deleteUserProfile({
+    body: req.params,
+  });
+
+  res.status(status).send(body);
+});
+
+router.route("/delete/masive").get(async (req, res) => {
+  console.log("delete/masive");
+  const deletedMassive = await removeMassiveUsers();
+
+  res.status(200).send(deletedMassive);
 });
 
 export default router;

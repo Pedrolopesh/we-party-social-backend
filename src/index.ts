@@ -30,9 +30,12 @@ const main = async () => {
   server.listen(port, () => {
     console.log(`Server is running ...`);
     console.log(`avaible routes: `);
-    console.log(`GET  -  http://localhost:${port}/api/`);
-    console.log(`POST -  http://localhost:${port}/api/userprofile/create`);
-    console.log(`GET  -  http://localhost:${port}/api/userprofile/all`);
+    console.log(`GET     -  http://localhost:${port}/api/`);
+    console.log(`POST    -  http://localhost:${port}/api/userprofile/create`);
+    console.log(`GET     -  http://localhost:${port}/api/userprofile/all`);
+    console.log(
+      `DELETE  -  http://localhost:${port}/api/userprofile/delete/user/:id`
+    );
   });
 };
 

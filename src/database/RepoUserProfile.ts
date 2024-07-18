@@ -2,6 +2,7 @@ import { ObjectId } from "mongodb";
 import { MongoClient } from "../database/mongo";
 import {
   CreateUserProfileParams,
+  IUpdateUserProfileParams,
   IUserProfileRepository,
   IUserProfileSearchParams,
   UserProfile,
@@ -17,7 +18,7 @@ export class UserProfileRepository implements IUserProfileRepository {
 
     const users = await MongoClient.db
       .collection<Omit<UserProfile, "id">>("UserProfile")
-      .findOne({ id: insertedId });
+      .findOne({ _id: insertedId });
 
     if (!users) {
       throw new Error("User not found");
@@ -70,6 +71,59 @@ export class UserProfileRepository implements IUserProfileRepository {
       .toArray();
 
     return userProfile.map(({ _id, ...rest }) => ({
+      ...rest,
+      id: _id.toHexString(),
+    }));
+  }
+
+  async updateUserProfile(
+    id: string,
+    params: Partial<IUpdateUserProfileParams>
+  ): Promise<UserProfile> {
+    const updatedUserProfile = await MongoClient.db
+      .collection<Omit<UserProfile, "id">>("UserProfile")
+      .findOneAndUpdate(
+        { _id: new ObjectId(id) },
+        { $set: params },
+        { returnDocument: "after" }
+      );
+
+    if (!updatedUserProfile) {
+      throw new Error("User not found");
+    }
+
+    const { _id, ...rest } = updatedUserProfile;
+
+    return {
+      ...rest,
+      id: _id.toHexString(),
+    };
+  }
+
+  async deleteUserProfile(id: string): Promise<UserProfile | null> {
+    const userProfile = await MongoClient.db
+      .collection<Omit<UserProfile, "id">>("UserProfile")
+      .findOneAndDelete({ _id: new ObjectId(id) });
+
+    if (!userProfile) {
+      return null;
+    }
+
+    const { _id, ...rest } = userProfile;
+
+    return {
+      ...rest,
+      id: _id.toHexString(),
+    };
+  }
+
+  async getAllUserProfiles(): Promise<UserProfile[]> {
+    const users = await MongoClient.db
+      .collection<Omit<UserProfile, "id">>("UserProfile")
+      .find({})
+      .toArray();
+
+    return users.map(({ _id, ...rest }) => ({
       ...rest,
       id: _id.toHexString(),
     }));
