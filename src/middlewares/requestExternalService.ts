@@ -1,10 +1,10 @@
 import { ICreateUsersParams } from "types/User";
 import axios from "axios";
-import { UserProfile } from "types/UserProfile";
+import { ICreatedExternalUser } from "types/UserProfile";
 
 export const requestCreateExternalUser = async (
   params: ICreateUsersParams
-): Promise<UserProfile> => {
+): Promise<ICreatedExternalUser> => {
   try {
     const { data } = await axios.post(
       "http://localhost:8000/api/users/create",

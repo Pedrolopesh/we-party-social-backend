@@ -42,6 +42,10 @@ export interface IUserProfileSearchParams {
   id?: string;
 }
 
+export interface ICreatedExternalUser {
+  userId: string;
+}
+
 export interface IUserProfileController {
   createUserProfile(
     httpRequest: HttpRequest<CreateUserProfileParams>

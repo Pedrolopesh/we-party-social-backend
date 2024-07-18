@@ -23,20 +23,21 @@ export class UserProfileController implements IUserProfileController {
       };
     }
 
+    // TO DO: evitar que a senha seja enviada para o repository de userProfile, deve ir somente para o repository de user (verificar com chatgpt como fazer isso seguindo boas praticas e utilizando sanitização)
     const userProfile = await this.userProfileRepository.createUserProfile(
       body
     );
-
-    console.log("userProfile =>", userProfile);
 
     const createdSqlUser = await requestCreateExternalUser({
       ...body,
       mongoUserId: userProfile.id,
     });
 
+    console.log("createdSqlUser =>", createdSqlUser);
+
     const updatedUserProfile =
       await this.userProfileRepository.updateUserProfile(userProfile.id, {
-        sqlUserId: createdSqlUser.sqlUserId,
+        sqlUserId: createdSqlUser.userId,
       });
 
     const result: any = {
