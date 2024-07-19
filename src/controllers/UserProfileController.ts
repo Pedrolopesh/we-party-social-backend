@@ -1,10 +1,15 @@
+import { ILoginExternalUserResponse } from "types/User";
 import { HttpRequest, HttpResponse } from "../controllers/protocols";
-import { requestCreateExternalUser } from "../middlewares/requestExternalService";
+import {
+  requestCreateExternalUser,
+  requestLoginExternalUser,
+} from "../middlewares/requestExternalService";
 import {
   CreateUserProfileParams,
   IUserProfileController,
   IUserProfileRepository,
   IUserProfileSearchParams,
+  LoginUserProfileParams,
   UserProfile,
 } from "types/UserProfile";
 
@@ -47,6 +52,13 @@ export class UserProfileController implements IUserProfileController {
         mongoUserId: userProfile.id,
       });
 
+      if (!createdSqlUser) {
+        return {
+          status: 400,
+          body: "Body is required",
+        };
+      }
+
       await this.userProfileRepository.updateUserProfile(userProfile.id, {
         sqlUserId: createdSqlUser.userId,
       });
@@ -68,6 +80,45 @@ export class UserProfileController implements IUserProfileController {
         body: error,
       };
     }
+  }
+
+  async loginUserProfile(
+    httpRequest: HttpRequest<LoginUserProfileParams>
+  ): Promise<HttpResponse<ILoginExternalUserResponse>> {
+    const { body } = httpRequest;
+
+    if (!body) {
+      return {
+        status: 400,
+        body: "Body is required",
+      };
+    }
+
+    const loginExternalUser = await requestLoginExternalUser({
+      email: body.email,
+      password: body.password,
+    });
+
+    // if (!loginExternalUser) {
+    //   return {
+    //     status: 401,
+    //     body: '',
+    //   };
+    // }
+
+    console.log("loginUserProfile =====> ", loginExternalUser);
+
+    if (loginExternalUser.status !== 200) {
+      return {
+        status: loginExternalUser.status,
+        body: loginExternalUser,
+      };
+    }
+
+    return {
+      status: 200,
+      body: "",
+    };
   }
 
   async deleteUserProfile(

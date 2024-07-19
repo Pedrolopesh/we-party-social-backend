@@ -23,6 +23,7 @@ export interface CreateUserProfileParams {
   notificationActive: boolean;
   document: string;
 }
+
 export interface IUpdateUserProfileParams {
   name?: string;
   username?: string;
@@ -46,6 +47,11 @@ export interface ICreatedExternalUser {
   userId: string;
   token: string;
   tokenExpiresAt: string;
+}
+
+export interface LoginUserProfileParams {
+  email: string;
+  password: string;
 }
 
 export interface IUserProfileController {

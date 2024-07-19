@@ -9,7 +9,6 @@ const router = express.Router();
 const authMiddleware = new AuthMiddleware();
 const userProfileValidation = new UserProfileValidation();
 
-// ============= PROTECTED ROUTES =============
 router
   .route("/create")
   .post(userProfileValidation.userInputValidations, async (req, res) => {
@@ -25,6 +24,26 @@ router
 
     res.status(status).send(body);
   });
+
+router.route("/login").post(async (req, res) => {
+  try {
+    const mongoUserProfileRepository = new UserProfileRepository();
+
+    const userProfileController = new UserProfileController(
+      mongoUserProfileRepository
+    );
+
+    const { body, status } = await userProfileController.loginUserProfile({
+      body: req.body,
+    });
+
+    res.status(status).send(body);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({ message: "Internal server error" });
+  }
+});
+// ============= PROTECTED ROUTES =============
 
 router.route("/all").get(async (req, res) => {
   const mongoUserProfileRepository = new UserProfileRepository();

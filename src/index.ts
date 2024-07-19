@@ -33,6 +33,7 @@ const main = async () => {
     console.log(`GET     -  http://localhost:${port}/api/`);
     console.log(`POST    -  http://localhost:${port}/api/userprofile/create`);
     console.log(`GET     -  http://localhost:${port}/api/userprofile/all`);
+    console.log(`POST    -  http://localhost:${port}/api/userprofile/login`);
     console.log(
       `DELETE  -  http://localhost:${port}/api/userprofile/delete/user/:id`
     );
