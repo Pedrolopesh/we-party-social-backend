@@ -33,13 +33,23 @@ export const requestLoginExternalUser = async (
       params
     );
 
-    const loginExternalUserResponse = {
-      ...data,
+    const loginExternalUserResponse: any = {
+      token: data?.auth?.token,
+      tokenExpiresAt: data?.auth?.tokenExpiresAt,
+      name: data?.name,
+      username: data?.username,
+      userProfileId: data?.mongoUserId,
     };
 
     return {
       status: 200,
-      response: loginExternalUserResponse,
+      response: {
+        token: data?.auth?.token,
+        tokenExpiresAt: data?.auth?.tokenExpiresAt,
+        name: data?.name,
+        username: data?.username,
+        userProfileId: data?.mongoUserId,
+      },
     };
   } catch (error: any) {
     return {

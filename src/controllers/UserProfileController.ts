@@ -99,15 +99,6 @@ export class UserProfileController implements IUserProfileController {
       password: body.password,
     });
 
-    // if (!loginExternalUser) {
-    //   return {
-    //     status: 401,
-    //     body: '',
-    //   };
-    // }
-
-    console.log("loginUserProfile =====> ", loginExternalUser);
-
     if (loginExternalUser.status !== 200) {
       return {
         status: loginExternalUser.status,
@@ -117,7 +108,7 @@ export class UserProfileController implements IUserProfileController {
 
     return {
       status: 200,
-      body: "",
+      body: loginExternalUser,
     };
   }
 

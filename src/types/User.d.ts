@@ -15,8 +15,10 @@ export interface ILoginExternalUserParams {
 export interface ILoginExternalUserResponse {
   status: number;
   response: {
-    userId: string;
     token: string;
     tokenExpiresAt: string;
+    name: string;
+    username: string;
+    userProfileId: string;
   };
 }
