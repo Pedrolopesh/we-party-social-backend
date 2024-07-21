@@ -2,16 +2,20 @@ import {
   ICreateExternalUserParams,
   ILoginExternalUserParams,
   ILoginExternalUserResponse,
+  IUserProfileRoleResponse,
 } from "types/User";
 import axios from "axios";
 import { ICreatedExternalUser } from "types/UserProfile";
 import { HttpResponse } from "controllers/protocols";
+import { header } from "express-validator";
+
+const port = process.env.EXTERNAL_SERVICE_PORT || 8000;
 
 export const requestCreateExternalUser = async (
   params: ICreateExternalUserParams
 ): Promise<ICreatedExternalUser> => {
   const { data, status } = await axios.post(
-    "http://localhost:8000/api/users/create",
+    `http://localhost:${port}/api/users/create`,
     params
   );
 
@@ -29,17 +33,9 @@ export const requestLoginExternalUser = async (
 ): Promise<ILoginExternalUserResponse> => {
   try {
     const { data } = await axios.post(
-      "http://localhost:8000/api/users/login",
+      `http://localhost:${port}/api/users/login`,
       params
     );
-
-    const loginExternalUserResponse: any = {
-      token: data?.auth?.token,
-      tokenExpiresAt: data?.auth?.tokenExpiresAt,
-      name: data?.name,
-      username: data?.username,
-      userProfileId: data?.mongoUserId,
-    };
 
     return {
       status: 200,
@@ -49,6 +45,40 @@ export const requestLoginExternalUser = async (
         name: data?.name,
         username: data?.username,
         userProfileId: data?.mongoUserId,
+      },
+    };
+  } catch (error: any) {
+    console.log("error", error?.response);
+    return {
+      status: error?.response?.status,
+      response: error?.response?.data,
+    };
+  }
+};
+
+export const requestCheckUserProfileRole = async (
+  email: string,
+  token: string
+): Promise<IUserProfileRoleResponse> => {
+  try {
+    console.log(email, token);
+
+    const { data } = await axios.post(
+      `http://localhost:${port}/api/roles/check`,
+      {
+        email,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    return {
+      status: 200,
+      response: {
+        role: data?.role,
       },
     };
   } catch (error: any) {

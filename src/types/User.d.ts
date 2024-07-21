@@ -22,3 +22,10 @@ export interface ILoginExternalUserResponse {
     userProfileId: string;
   };
 }
+
+export interface IUserProfileRoleResponse {
+  status: number;
+  response: {
+    role: string;
+  };
+}

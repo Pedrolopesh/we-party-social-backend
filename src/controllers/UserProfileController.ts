@@ -99,7 +99,7 @@ export class UserProfileController implements IUserProfileController {
       password: body.password,
     });
 
-    if (loginExternalUser.status !== 200) {
+    if (loginExternalUser?.status !== 200) {
       return {
         status: loginExternalUser.status,
         body: loginExternalUser,

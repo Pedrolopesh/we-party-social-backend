@@ -1,18 +1,22 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
-import { HttpResponse } from "../controllers/protocols";
+// import { HttpResponse } from "../controllers/protocols";
 
-interface DecodedToken {
-  id: string;
-}
+// interface DecodedToken {
+//   id: string;
+// }
 
 // Estendendo a interface Request do Express
-declare global {
-  namespace Express {
-    interface Request {
-      userId?: string;
-    }
-  }
+// declare global {
+//   namespace Express {
+//     interface Request {
+//       userId?: string;
+//     }
+//   }
+// }
+interface JwtPayload {
+  iat: number; // Issued at
+  exp: number; // Expiration time
 }
 
 export class AuthMiddleware {
@@ -23,10 +27,13 @@ export class AuthMiddleware {
   ): Promise<Response<any, Record<string, any>> | void> {
     try {
       const authHeader = req.headers.authorization;
+      const authUserId = req.headers.userProfileId;
       const authConfig = process.env.SECRET_KEY || "";
 
-      if (!authHeader) {
-        return res.status(401).send("No token provided");
+      if (!authHeader || !authUserId) {
+        return res
+          .status(401)
+          .send("No token or userId provided in request headers");
       }
 
       const parts = authHeader.split(" ");
@@ -42,17 +49,20 @@ export class AuthMiddleware {
       }
 
       // Bearer
-
       jwt.verify(token, authConfig, (err: any, decoded: any) => {
         if (err) {
           return res.status(401).send("Token Invalid");
         }
 
-        if (!decoded || !decoded.id) {
+        const isTokenValid = (payload: JwtPayload): boolean => {
+          const now = Math.floor(Date.now() / 1000); // tempo atual em segundos
+          return now >= payload.iat && now <= payload.exp;
+        };
+
+        if (!isTokenValid(decoded)) {
           return res.status(401).send("Invalid token payload");
         }
 
-        req.userId = decoded.id;
         return next();
       });
     } catch (error) {

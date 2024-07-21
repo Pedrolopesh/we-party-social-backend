@@ -4,33 +4,39 @@ import { UserProfileValidation } from "../controllers/UserProfileValidation";
 import { UserProfileRepository } from "../database/RepoUserProfile";
 import { UserProfileController } from "../controllers/UserProfileController";
 import { removeMassiveUsers } from "../local-helprs/remove-massive";
+import { PermissionMiddleware } from "../middlewares/checkPermission";
 
 const router = express.Router();
 const authMiddleware = new AuthMiddleware();
 const userProfileValidation = new UserProfileValidation();
+const userProfileRepository = new UserProfileRepository();
+const permissionMiddleware = new PermissionMiddleware();
 
 router
   .route("/create")
   .post(userProfileValidation.userInputValidations, async (req, res) => {
-    const mongoUserProfileRepository = new UserProfileRepository();
+    try {
+      const userProfileController = new UserProfileController(
+        userProfileRepository
+      );
 
-    const userProfileController = new UserProfileController(
-      mongoUserProfileRepository
-    );
+      const { body, status } = await userProfileController.createUserProfile({
+        body: req.body,
+      });
 
-    const { body, status } = await userProfileController.createUserProfile({
-      body: req.body,
-    });
-
-    res.status(status).send(body);
+      res.status(status).send(body);
+    } catch (error) {
+      console.error(error);
+      res
+        .status(500)
+        .send({ message: "Internal server error in create route" });
+    }
   });
 
 router.route("/login").post(async (req, res) => {
   try {
-    const mongoUserProfileRepository = new UserProfileRepository();
-
     const userProfileController = new UserProfileController(
-      mongoUserProfileRepository
+      userProfileRepository
     );
 
     const { body, status } = await userProfileController.loginUserProfile({
@@ -40,10 +46,19 @@ router.route("/login").post(async (req, res) => {
     res.status(status).send(body);
   } catch (error) {
     console.error(error);
-    res.status(500).send({ message: "Internal server error" });
+    res.status(500).send({ message: `Internal server error in login route` });
   }
 });
 // ============= PROTECTED ROUTES =============
+
+router
+  .route("/all")
+  .get(
+    permissionMiddleware.checkPermission.bind(permissionMiddleware),
+    async (req, res) => {
+      res.status(200).send(" testing ");
+    }
+  );
 
 router.route("/all").get(async (req, res) => {
   const mongoUserProfileRepository = new UserProfileRepository();
