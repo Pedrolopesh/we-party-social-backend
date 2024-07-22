@@ -6,7 +6,7 @@ import {
   IUserProfileRepository,
   IUserProfileSearchParams,
   UserProfile,
-} from "types/UserProfile";
+} from "controllers/UserProfile/UserProfile";
 
 export class UserProfileRepository implements IUserProfileRepository {
   async createUserProfile(

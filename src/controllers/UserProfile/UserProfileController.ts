@@ -1,9 +1,9 @@
 import { ILoginExternalUserResponse } from "types/User";
-import { HttpRequest, HttpResponse } from "../controllers/protocols";
+import { HttpRequest, HttpResponse } from "../protocols";
 import {
   requestCreateExternalUser,
   requestLoginExternalUser,
-} from "../middlewares/requestExternalService";
+} from "../../middlewares/requestExternalService";
 import {
   CreateUserProfileParams,
   IUserProfileController,
@@ -11,7 +11,7 @@ import {
   IUserProfileSearchParams,
   LoginUserProfileParams,
   UserProfile,
-} from "types/UserProfile";
+} from "controllers/UserProfile/UserProfile";
 
 export class UserProfileController implements IUserProfileController {
   constructor(private readonly userProfileRepository: IUserProfileRepository) {}

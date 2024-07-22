@@ -5,7 +5,7 @@ import {
   IUserProfileRoleResponse,
 } from "types/User";
 import axios from "axios";
-import { ICreatedExternalUser } from "types/UserProfile";
+import { ICreatedExternalUser } from "controllers/UserProfile/UserProfile";
 import { HttpResponse } from "controllers/protocols";
 import { header } from "express-validator";
 

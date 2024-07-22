@@ -14,11 +14,6 @@ export class PermissionMiddleware {
     next: NextFunction
   ): Promise<Response<any, Record<string, any>> | void> {
     try {
-      // Check user role
-      // recive route the user is trying to access
-      // check the user role
-      // if the user has permission, call next()
-
       const route = req.originalUrl;
       console.log({ route });
 

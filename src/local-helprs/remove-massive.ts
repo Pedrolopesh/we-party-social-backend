@@ -1,6 +1,6 @@
 import axios from "axios";
 import { MongoClient } from "../database/mongo";
-import { UserProfile } from "../types/UserProfile";
+import { UserProfile } from "../controllers/UserProfile/UserProfile";
 
 export const removeMassiveUsers = async () => {
   try {

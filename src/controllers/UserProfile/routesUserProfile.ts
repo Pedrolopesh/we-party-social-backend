@@ -1,10 +1,10 @@
 import express from "express";
-import { AuthMiddleware } from "../middlewares/auth";
-import { UserProfileValidation } from "../controllers/UserProfileValidation";
-import { UserProfileRepository } from "../database/RepoUserProfile";
-import { UserProfileController } from "../controllers/UserProfileController";
-import { removeMassiveUsers } from "../local-helprs/remove-massive";
-import { PermissionMiddleware } from "../middlewares/checkPermission";
+import { AuthMiddleware } from "../../middlewares/auth";
+import { UserProfileValidation } from "./UserProfileValidation";
+import { UserProfileRepository } from "../../database/RepoUserProfile";
+import { UserProfileController } from "./UserProfileController";
+import { removeMassiveUsers } from "../../local-helprs/remove-massive";
+import { PermissionMiddleware } from "../../middlewares/checkPermission";
 
 const router = express.Router();
 const authMiddleware = new AuthMiddleware();

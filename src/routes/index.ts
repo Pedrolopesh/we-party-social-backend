@@ -1,6 +1,7 @@
 import express from "express";
 
-import routesUserProfile from "./routesUserProfile";
+import routesUserProfile from "../controllers/UserProfile/routesUserProfile";
+import routesInterest from "../controllers/Interest/InterestRoutes";
 
 const router = express.Router();
 
@@ -15,5 +16,6 @@ router.route("/").get(async (_req, res) => {
 
 // Mount user routes onto the main router
 router.use("/userprofile", routesUserProfile);
+router.use("/interest", routesInterest);
 
 export default router;

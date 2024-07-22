@@ -1,19 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
-// import { HttpResponse } from "../controllers/protocols";
 
-// interface DecodedToken {
-//   id: string;
-// }
-
-// Estendendo a interface Request do Express
-// declare global {
-//   namespace Express {
-//     interface Request {
-//       userId?: string;
-//     }
-//   }
-// }
 interface JwtPayload {
   iat: number; // Issued at
   exp: number; // Expiration time
