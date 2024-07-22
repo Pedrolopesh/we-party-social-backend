@@ -1,4 +1,3 @@
-import { header } from "express-validator";
 import { InterestRepository } from "./InterestRepository";
 import express from "express";
 const router = express.Router();
@@ -39,6 +38,7 @@ router
   .patch(
     authMiddleware.validateToken,
     permissionMiddleware.checkPermission.bind(permissionMiddleware),
+    interesntValidation.interestIdParamValidations,
     interesntValidation.interestInputValidations,
     async (req, res) => {
       try {
@@ -64,7 +64,7 @@ router
   .get(
     authMiddleware.validateToken,
     permissionMiddleware.checkPermission.bind(permissionMiddleware),
-    interesntValidation.interestSearchInputValidations,
+    interesntValidation.interestSearchParamsValidations,
     async (req, res) => {
       try {
         console.log("req.params", req.query);
@@ -83,24 +83,26 @@ router
     }
   );
 
-router.route("/delete/:id").delete(
-  authMiddleware.validateToken,
-  permissionMiddleware.checkPermission.bind(permissionMiddleware),
-  // interesntValidation.interestInputValidations,
-  async (req, res) => {
-    try {
-      const { body, status } = await interestController.deleteInterest({
-        body: req.params,
-      });
+router
+  .route("/delete/:id")
+  .delete(
+    authMiddleware.validateToken,
+    permissionMiddleware.checkPermission.bind(permissionMiddleware),
+    interesntValidation.interestIdParamValidations,
+    async (req, res) => {
+      try {
+        const { body, status } = await interestController.deleteInterest({
+          body: req.params,
+        });
 
-      res.status(status).send(body);
-    } catch (error) {
-      console.error(error);
-      res
-        .status(500)
-        .send({ message: "Internal server error in create route" });
+        res.status(status).send(body);
+      } catch (error) {
+        console.error(error);
+        res
+          .status(500)
+          .send({ message: "Internal server error in create route" });
+      }
     }
-  }
-);
+  );
 
 export default router;

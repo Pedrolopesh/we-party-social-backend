@@ -12,9 +12,18 @@ import {
   LoginUserProfileParams,
   UserProfile,
 } from "controllers/UserProfile/UserProfile";
+import { IInterestRepository } from "controllers/Interest/Interest";
+
+export interface IUserProfileInterestParams {
+  userProfileId: string;
+  interestId: string;
+}
 
 export class UserProfileController implements IUserProfileController {
-  constructor(private readonly userProfileRepository: IUserProfileRepository) {}
+  constructor(
+    private readonly userProfileRepository: IUserProfileRepository,
+    private readonly interestRepository?: IInterestRepository
+  ) {}
 
   async createUserProfile(
     httpRequest: HttpRequest<CreateUserProfileParams>
@@ -158,6 +167,67 @@ export class UserProfileController implements IUserProfileController {
     return {
       status: 200,
       body: userProfiles,
+    };
+  }
+
+  async addInterestToUserProfile(
+    httpRequest: HttpRequest<IUserProfileInterestParams>
+  ): Promise<HttpResponse<UserProfile | null>> {
+    const { body } = httpRequest;
+
+    if (!body) {
+      return {
+        status: 400,
+        body: "Body is required",
+      };
+    }
+
+    const userProfile = await this.userProfileRepository.findUserProfileById(
+      body.userProfileId
+    );
+
+    if (!userProfile) {
+      return {
+        status: 400,
+        body: "User not found",
+      };
+    }
+
+    if (!this.interestRepository) {
+      return {
+        status: 400,
+        body: "Interest repository not found",
+      };
+    }
+
+    const interest = await this.interestRepository.searchInterestRepository({
+      id: body.interestId,
+    });
+
+    if (!interest) {
+      return {
+        status: 400,
+        body: "Interest not found",
+      };
+    }
+
+    const updatedInterest =
+      await this.userProfileRepository.addInterestToUserProfile(
+        body.userProfileId,
+        body.interestId,
+        interest[0].name
+      );
+
+    if (!updatedInterest) {
+      return {
+        status: 400,
+        body: "Error adding interest",
+      };
+    }
+
+    return {
+      status: 200,
+      body: updatedInterest,
     };
   }
 }

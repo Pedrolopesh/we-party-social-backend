@@ -1,4 +1,4 @@
-import { UserProfileRepository } from "../database/RepoUserProfile";
+import { UserProfileRepository } from "../controllers/UserProfile/UserProfileRepository";
 import { Request, Response, NextFunction } from "express";
 import { requestCheckUserProfileRole } from "./requestExternalService";
 
@@ -21,6 +21,7 @@ export class PermissionMiddleware {
           /^\/userprofile\/create$/,
           /^\/userprofile\/login$/,
           /^\/api\/userprofile\/all$/,
+          /^\/api\/userprofile\/add\/interest$/,
           /^\/api\/interest\/create$/,
           /^\/api\/interest\/update(\/[a-zA-Z0-9]+)?$/,
           /^\/api\/interest\/search(\?.*)?$/,

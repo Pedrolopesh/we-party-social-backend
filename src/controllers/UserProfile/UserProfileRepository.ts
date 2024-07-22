@@ -1,12 +1,12 @@
 import { ObjectId } from "mongodb";
-import { MongoClient } from "../database/mongo";
+import { MongoClient } from "../../database/mongo";
 import {
   CreateUserProfileParams,
   IUpdateUserProfileParams,
   IUserProfileRepository,
   IUserProfileSearchParams,
   UserProfile,
-} from "controllers/UserProfile/UserProfile";
+} from "./UserProfile";
 
 export class UserProfileRepository implements IUserProfileRepository {
   async createUserProfile(
@@ -127,5 +127,45 @@ export class UserProfileRepository implements IUserProfileRepository {
       ...rest,
       id: _id.toHexString(),
     }));
+  }
+
+  async addInterestToUserProfile(
+    userProfileId: string,
+    interestId: string,
+    interestName: string
+  ): Promise<UserProfile | null> {
+    const interestAlreadyAdded = await MongoClient.db
+      .collection<Omit<UserProfile, "id">>("UserProfile")
+      .findOne({ _id: new ObjectId(userProfileId), interestId });
+
+    if (interestAlreadyAdded) {
+      throw new Error("Interest already added");
+    }
+
+    const updatedInterest = await MongoClient.db
+      .collection<Omit<UserProfile, "id">>("UserProfile")
+      .findOneAndUpdate(
+        { _id: new ObjectId(userProfileId) },
+        {
+          $push: {
+            interest: {
+              interestId,
+              name: interestName,
+            },
+          },
+        },
+        { returnDocument: "after" }
+      );
+
+    if (!updatedInterest) {
+      return null;
+    }
+
+    const { _id, ...rest } = updatedInterest;
+
+    return {
+      ...rest,
+      id: _id.toHexString(),
+    };
   }
 }

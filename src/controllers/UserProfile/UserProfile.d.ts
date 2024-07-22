@@ -54,6 +54,11 @@ export interface LoginUserProfileParams {
   password: string;
 }
 
+export interface IUserProfileInterestParams {
+  userProfileId: string;
+  interestId: string;
+}
+
 export interface IUserProfileController {
   createUserProfile(
     httpRequest: HttpRequest<CreateUserProfileParams>
@@ -66,6 +71,10 @@ export interface IUserProfileController {
   getAllUserProfiles(
     httpRequest: HttpRequest<IUserProfileSearchParams>
   ): Promise<HttpResponse<UserProfile[]>>;
+
+  addInterestToUserProfile(
+    httpRequest: HttpRequest<IUserProfileInterestParams>
+  ): Promise<HttpResponse<UserProfile | null>>;
 }
 
 export interface IUserProfileRepository {
@@ -80,4 +89,10 @@ export interface IUserProfileRepository {
     params: IUpdateUserProfileParams
   ): Promise<UserProfile>;
   deleteUserProfile(id: string): Promise<UserProfile | null>;
+
+  addInterestToUserProfile(
+    userProfileId: string,
+    interestId: string,
+    interestName: string
+  ): Promise<UserProfile | null>;
 }
