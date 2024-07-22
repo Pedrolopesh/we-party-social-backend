@@ -15,16 +15,19 @@ export class PermissionMiddleware {
   ): Promise<Response<any, Record<string, any>> | void> {
     try {
       const route = req.originalUrl;
-      console.log({ route });
 
-      const permissions: { [key: string]: string[] } = {
+      const permissions: { [key: string]: RegExp[] } = {
         common: [
-          "/userprofile/create",
-          "/userprofile/login",
-          "/api/userprofile/all",
+          /^\/userprofile\/create$/,
+          /^\/userprofile\/login$/,
+          /^\/api\/userprofile\/all$/,
+          /^\/api\/interest\/create$/,
+          /^\/api\/interest\/update(\/[a-zA-Z0-9]+)?$/,
+          /^\/api\/interest\/search(\?.*)?$/,
+          /^\/api\/interest\/delete(\/[a-zA-Z0-9]+)?$/,
         ],
-        admin: ["/userprofile/all"],
-        promoter: ["/userprofile/all"],
+        admin: [/^\/userprofile\/all$/],
+        promoter: [/^\/userprofile\/all$/],
       };
 
       const token = req.headers.authorization;
@@ -57,8 +60,12 @@ export class PermissionMiddleware {
           .send(checkUserProfile.response);
       }
 
-      const userHasPermission =
-        permissions[checkUserProfile.response.role].includes(route);
+      const userRole = checkUserProfile.response.role;
+      const userPermissions = permissions[userRole];
+
+      const userHasPermission = userPermissions.some((pattern) =>
+        pattern.test(route)
+      );
 
       if (!userHasPermission) {
         return res.status(403).send("User does not have permission");

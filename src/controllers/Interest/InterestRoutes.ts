@@ -1,20 +1,18 @@
+import { header } from "express-validator";
+import { InterestRepository } from "./InterestRepository";
 import express from "express";
 const router = express.Router();
 import { InteresntValidation } from "./InterestValidation";
 import { AuthMiddleware } from "../../middlewares/auth";
 import { PermissionMiddleware } from "../../middlewares/checkPermission";
-// import { UserProfileValidation } from "./UserProfileValidation";
-// import { UserProfileRepository } from "../../database/RepoUserProfile";
-// import { UserProfileController } from "./UserProfileController";
-// import { removeMassiveUsers } from "../../local-helprs/remove-massive";
-// import { PermissionMiddleware } from "../../middlewares/checkPermission";
+import { InterestController } from "./InterestController";
 
 const interesntValidation = new InteresntValidation();
 const authMiddleware = new AuthMiddleware();
 const permissionMiddleware = new PermissionMiddleware();
 
-// const userProfileValidation = new UserProfileValidation();
-// const userProfileRepository = new UserProfileRepository();
+const interestRepository = new InterestRepository();
+const interestController = new InterestController(interestRepository);
 
 router
   .route("/create")
@@ -24,43 +22,34 @@ router
     interesntValidation.interestInputValidations,
     async (req, res) => {
       try {
-        // const userProfileController = new UserProfileController(
-        //   userProfileRepository
-        // );
+        const { body, status } = await interestController.createInterest({
+          body: req.body,
+        });
 
-        // const { body, status } = await userProfileController.createUserProfile({
-        //   body: req.body,
-        // });
-
-        // res.status(status).send(body);
-        res.status(200).send("request validated");
-      } catch (error) {
+        res.status(status).send(body);
+      } catch (error: any) {
         console.error(error);
-        res
-          .status(500)
-          .send({ message: "Internal server error in create route" });
+        res.status(500).send({ message: error.message });
       }
     }
   );
 
 router
-  .route("/update")
-  .post(
+  .route("/update/:id")
+  .patch(
     authMiddleware.validateToken,
     permissionMiddleware.checkPermission.bind(permissionMiddleware),
     interesntValidation.interestInputValidations,
     async (req, res) => {
       try {
-        // const userProfileController = new UserProfileController(
-        //   userProfileRepository
-        // );
+        const { body, status } = await interestController.updateInterest({
+          body: {
+            params: req.params,
+            newInterest: req.body,
+          },
+        });
 
-        // const { body, status } = await userProfileController.createUserProfile({
-        //   body: req.body,
-        // });
-
-        // res.status(status).send(body);
-        res.status(200).send("request validated");
+        res.status(status).send(body);
       } catch (error) {
         console.error(error);
         res
@@ -72,22 +61,19 @@ router
 
 router
   .route("/search")
-  .post(
+  .get(
     authMiddleware.validateToken,
     permissionMiddleware.checkPermission.bind(permissionMiddleware),
-    interesntValidation.interestInputValidations,
+    interesntValidation.interestSearchInputValidations,
     async (req, res) => {
       try {
-        // const userProfileController = new UserProfileController(
-        //   userProfileRepository
-        // );
+        console.log("req.params", req.query);
 
-        // const { body, status } = await userProfileController.createUserProfile({
-        //   body: req.body,
-        // });
+        const { body, status } = await interestController.serachInterest({
+          body: req.query,
+        });
 
-        // res.status(status).send(body);
-        res.status(200).send("request validated");
+        res.status(status).send(body);
       } catch (error) {
         console.error(error);
         res
@@ -97,31 +83,24 @@ router
     }
   );
 
-router
-  .route("/delete")
-  .post(
-    authMiddleware.validateToken,
-    permissionMiddleware.checkPermission.bind(permissionMiddleware),
-    interesntValidation.interestInputValidations,
-    async (req, res) => {
-      try {
-        // const userProfileController = new UserProfileController(
-        //   userProfileRepository
-        // );
+router.route("/delete/:id").delete(
+  authMiddleware.validateToken,
+  permissionMiddleware.checkPermission.bind(permissionMiddleware),
+  // interesntValidation.interestInputValidations,
+  async (req, res) => {
+    try {
+      const { body, status } = await interestController.deleteInterest({
+        body: req.params,
+      });
 
-        // const { body, status } = await userProfileController.createUserProfile({
-        //   body: req.body,
-        // });
-
-        // res.status(status).send(body);
-        res.status(200).send("request validated");
-      } catch (error) {
-        console.error(error);
-        res
-          .status(500)
-          .send({ message: "Internal server error in create route" });
-      }
+      res.status(status).send(body);
+    } catch (error) {
+      console.error(error);
+      res
+        .status(500)
+        .send({ message: "Internal server error in create route" });
     }
-  );
+  }
+);
 
 export default router;

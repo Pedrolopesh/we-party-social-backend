@@ -61,8 +61,6 @@ export const requestCheckUserProfileRole = async (
   token: string
 ): Promise<IUserProfileRoleResponse> => {
   try {
-    console.log(email, token);
-
     const { data } = await axios.post(
       `http://localhost:${port}/api/roles/check`,
       {

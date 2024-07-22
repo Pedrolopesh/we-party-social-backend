@@ -7,7 +7,20 @@ export class InteresntValidation {
     res: Response,
     next: NextFunction
   ) {
-    await check("name", "name is required").run(req);
+    await check("name", "name is required").isString().notEmpty().run(req);
+
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+    next();
+  }
+  async interestSearchInputValidations(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    await check("name", "name is required").isString().notEmpty().run(req);
 
     const errors = validationResult(req);
     if (!errors.isEmpty()) {

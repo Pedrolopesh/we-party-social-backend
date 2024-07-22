@@ -14,7 +14,7 @@ export class AuthMiddleware {
   ): Promise<Response<any, Record<string, any>> | void> {
     try {
       const authHeader = req.headers.authorization;
-      const authUserId = req.headers.userProfileId;
+      const authUserId = req.headers.userprofileid;
       const authConfig = process.env.SECRET_KEY || "";
 
       if (!authHeader || !authUserId) {
