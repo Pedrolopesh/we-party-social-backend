@@ -79,4 +79,34 @@ export class InteresntValidation {
     }
     next();
   }
+
+  async followInputValidations(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    await check("userProfileId", "userProfileId is required")
+      .isString()
+      .withMessage("id must be a string")
+      .notEmpty()
+      .withMessage("id is required")
+      .isLength({ min: 24, max: 24 })
+      .withMessage("id must be 24 characters long")
+      .run(req);
+
+    await check("friendUserProfileId", "friendUserProfileId is required")
+      .isString()
+      .withMessage("id must be a string")
+      .notEmpty()
+      .withMessage("id is required")
+      .isLength({ min: 24, max: 24 })
+      .withMessage("id must be 24 characters long")
+      .run(req);
+
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+    next();
+  }
 }

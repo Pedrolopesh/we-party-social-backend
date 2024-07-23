@@ -168,4 +168,66 @@ export class UserProfileRepository implements IUserProfileRepository {
       id: _id.toHexString(),
     };
   }
+
+  async followUserProfile(
+    userProfileId: string,
+    friendUserProfileId: string
+  ): Promise<UserProfile | null> {
+    const friendId = friendUserProfileId;
+
+    const userProfile = await this.findUserProfileById(userProfileId);
+    if (!userProfile) {
+      return null;
+    }
+
+    const hasFollowers = userProfile?.following;
+
+    console.log("hasFollowers: ", !!hasFollowers);
+    const isFollowing = !!hasFollowers
+      ? userProfile.following.some((follow: string) => follow === friendId)
+      : false;
+
+    console.log(isFollowing);
+    if (isFollowing) {
+      // Se estiver seguindo, remove o usuário da lista de following
+      const updatedUserProfile = await MongoClient.db
+        .collection<Omit<UserProfile, "id">>("UserProfile")
+        .findOneAndUpdate(
+          { _id: new ObjectId(userProfileId) },
+          { $pull: { following: friendId } },
+          { returnDocument: "after" }
+        );
+
+      if (!updatedUserProfile) {
+        return null;
+      }
+
+      const { _id, ...rest } = updatedUserProfile;
+
+      return {
+        ...rest,
+        id: _id.toHexString(),
+      };
+    } else {
+      // Se não estiver seguindo, adiciona o usuário à lista de following
+      const updatedUserProfile = await MongoClient.db
+        .collection<Omit<UserProfile, "id">>("UserProfile")
+        .findOneAndUpdate(
+          { _id: new ObjectId(userProfileId) },
+          { $addToSet: { following: friendId } },
+          { returnDocument: "after" }
+        );
+
+      if (!updatedUserProfile) {
+        return null;
+      }
+
+      const { _id, ...rest } = updatedUserProfile;
+
+      return {
+        ...rest,
+        id: _id.toHexString(),
+      };
+    }
+  }
 }

@@ -19,6 +19,11 @@ export interface IUserProfileInterestParams {
   interestId: string;
 }
 
+export interface IFollowUserInput {
+  userProfileId: string;
+  friendUserProfileId: string;
+}
+
 export class UserProfileController implements IUserProfileController {
   constructor(
     private readonly userProfileRepository: IUserProfileRepository,
@@ -169,7 +174,6 @@ export class UserProfileController implements IUserProfileController {
       body: userProfiles,
     };
   }
-
   async addInterestToUserProfile(
     httpRequest: HttpRequest<IUserProfileInterestParams>
   ): Promise<HttpResponse<UserProfile | null>> {
@@ -228,6 +232,49 @@ export class UserProfileController implements IUserProfileController {
     return {
       status: 200,
       body: updatedInterest,
+    };
+  }
+
+  async followUserProfile(
+    httpRequest: HttpRequest<IFollowUserInput>
+  ): Promise<HttpResponse<UserProfile | null>> {
+    const { body } = httpRequest;
+
+    if (!body) {
+      return Promise.resolve({
+        status: 400,
+        body: "Body is required",
+      });
+    }
+
+    const findUserProfileFriend =
+      await this.userProfileRepository.findUserProfileById(
+        body.friendUserProfileId
+      );
+
+    if (!findUserProfileFriend) {
+      return {
+        status: 400,
+        body: "User not found",
+      };
+    }
+
+    const followUserProfile =
+      await this.userProfileRepository.followUserProfile(
+        body.friendUserProfileId,
+        body.userProfileId
+      );
+
+    if (!followUserProfile) {
+      return {
+        status: 400,
+        body: "Error following user",
+      };
+    }
+
+    return {
+      status: 200,
+      body: findUserProfileFriend,
     };
   }
 }

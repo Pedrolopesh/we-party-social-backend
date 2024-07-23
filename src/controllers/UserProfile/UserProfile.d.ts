@@ -6,11 +6,11 @@ export interface UserProfile {
   username: string;
   email: string;
   type: string;
-  following: string;
   followers: string;
   acceptedTerms: boolean;
   notificationActive: boolean;
   sqlUserId: string;
+  following: string[];
 }
 
 export interface CreateUserProfileParams {
@@ -75,6 +75,10 @@ export interface IUserProfileController {
   addInterestToUserProfile(
     httpRequest: HttpRequest<IUserProfileInterestParams>
   ): Promise<HttpResponse<UserProfile | null>>;
+
+  followUserProfile(
+    httpRequest: HttpRequest<IFollowUserInput>
+  ): Promise<HttpResponse<UserProfile | null>>;
 }
 
 export interface IUserProfileRepository {
@@ -94,5 +98,10 @@ export interface IUserProfileRepository {
     userProfileId: string,
     interestId: string,
     interestName: string
+  ): Promise<UserProfile | null>;
+
+  followUserProfile(
+    userProfileId: string,
+    friendUserProfileId: string
   ): Promise<UserProfile | null>;
 }

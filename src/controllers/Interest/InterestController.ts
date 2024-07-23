@@ -88,8 +88,6 @@ export class InterestController implements IInterestController {
       });
     }
 
-    console.log("params => ", body);
-
     const findInterest = await this.interestRepository.searchInterestRepository(
       {
         ...(body.name && { name: body.name }),
@@ -115,6 +113,7 @@ export class InterestController implements IInterestController {
         body: "Error searching interest",
       }));
   }
+
   getAllInterests(
     httpRequest: HttpRequest<IInterestSearchParams>
   ): Promise<HttpResponse<Interest[]>> {

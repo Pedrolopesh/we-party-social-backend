@@ -69,6 +69,27 @@ router
 
         res.status(status).send(body);
       } catch (error: any) {
+        console.error(error);
+        res.status(500).send({ message: error?.message });
+      }
+    }
+  );
+
+router
+  .route("/follow")
+  .post(
+    authMiddleware.validateToken,
+    permissionMiddleware.checkPermission.bind(permissionMiddleware),
+    interesntValidation.followInputValidations,
+    async (req, res) => {
+      try {
+        const { body, status } = await userProfileController.followUserProfile({
+          body: req.body,
+        });
+
+        res.status(status).send(body);
+      } catch (error: any) {
+        console.error(error);
         res.status(500).send({ message: error?.message });
       }
     }
