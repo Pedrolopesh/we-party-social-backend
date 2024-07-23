@@ -11,6 +11,7 @@ export interface UserProfile {
   notificationActive: boolean;
   sqlUserId: string;
   following: string[];
+  interest: string[];
 }
 
 export interface CreateUserProfileParams {
@@ -96,8 +97,7 @@ export interface IUserProfileRepository {
 
   addInterestToUserProfile(
     userProfileId: string,
-    interestId: string,
-    interestName: string
+    interestId: string
   ): Promise<UserProfile | null>;
 
   followUserProfile(

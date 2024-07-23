@@ -218,8 +218,7 @@ export class UserProfileController implements IUserProfileController {
     const updatedInterest =
       await this.userProfileRepository.addInterestToUserProfile(
         body.userProfileId,
-        body.interestId,
-        interest[0].name
+        body.interestId
       );
 
     if (!updatedInterest) {

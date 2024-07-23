@@ -131,44 +131,61 @@ export class UserProfileRepository implements IUserProfileRepository {
 
   async addInterestToUserProfile(
     userProfileId: string,
-    interestId: string,
-    interestName: string
+    interestId: string
   ): Promise<UserProfile | null> {
-    const interestAlreadyAdded = await MongoClient.db
-      .collection<Omit<UserProfile, "id">>("UserProfile")
-      .findOne({ _id: new ObjectId(userProfileId), interestId });
-
-    if (interestAlreadyAdded) {
-      throw new Error("Interest already added");
-    }
-
-    const updatedInterest = await MongoClient.db
-      .collection<Omit<UserProfile, "id">>("UserProfile")
-      .findOneAndUpdate(
-        { _id: new ObjectId(userProfileId) },
-        {
-          $push: {
-            interest: {
-              interestId,
-              name: interestName,
-            },
-          },
-        },
-        { returnDocument: "after" }
-      );
-
-    if (!updatedInterest) {
+    const userProfile = await this.findUserProfileById(userProfileId);
+    if (!userProfile) {
       return null;
     }
 
-    const { _id, ...rest } = updatedInterest;
+    const hasInterests = userProfile?.interest;
 
-    return {
-      ...rest,
-      id: _id.toHexString(),
-    };
+    const isFollowing = !!hasInterests
+      ? userProfile.interest.some((follow: string) => follow === interestId)
+      : false;
+
+    if (isFollowing) {
+      // Se estiver seguindo, remove o usuário da lista de following
+      const updatedUserProfile = await MongoClient.db
+        .collection<Omit<UserProfile, "id">>("UserProfile")
+        .findOneAndUpdate(
+          { _id: new ObjectId(userProfileId) },
+          { $pull: { interest: interestId } },
+          { returnDocument: "after" }
+        );
+
+      if (!updatedUserProfile) {
+        return null;
+      }
+
+      const { _id, ...rest } = updatedUserProfile;
+
+      return {
+        ...rest,
+        id: _id.toHexString(),
+      };
+    } else {
+      // Se não estiver seguindo, adiciona o usuário à lista de following
+      const updatedUserProfile = await MongoClient.db
+        .collection<Omit<UserProfile, "id">>("UserProfile")
+        .findOneAndUpdate(
+          { _id: new ObjectId(userProfileId) },
+          { $addToSet: { interest: interestId } },
+          { returnDocument: "after" }
+        );
+
+      if (!updatedUserProfile) {
+        return null;
+      }
+
+      const { _id, ...rest } = updatedUserProfile;
+
+      return {
+        ...rest,
+        id: _id.toHexString(),
+      };
+    }
   }
-
   async followUserProfile(
     userProfileId: string,
     friendUserProfileId: string
@@ -182,12 +199,10 @@ export class UserProfileRepository implements IUserProfileRepository {
 
     const hasFollowers = userProfile?.following;
 
-    console.log("hasFollowers: ", !!hasFollowers);
     const isFollowing = !!hasFollowers
       ? userProfile.following.some((follow: string) => follow === friendId)
       : false;
 
-    console.log(isFollowing);
     if (isFollowing) {
       // Se estiver seguindo, remove o usuário da lista de following
       const updatedUserProfile = await MongoClient.db
