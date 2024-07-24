@@ -1,31 +1,25 @@
 import { ObjectId } from "mongodb";
 import { MongoClient } from "../../database/mongo";
 
-import {
-  IPromoterEvent,
-  IPromoterEventRepository,
-  ISearchPromoterEventQuerys,
-} from "./PromoterEvent";
+import { IEvent, IEventRepository, ISearchEventQuerys } from "./Event";
 import { param } from "express-validator";
 import { UserProfile } from "controllers/UserProfile/UserProfile";
 
-export class PromoterEventRepository implements IPromoterEventRepository {
-  async createPromoterEventRepository(
-    params: Partial<IPromoterEvent>
-  ): Promise<IPromoterEvent> {
+export class EventRepository implements IEventRepository {
+  async createEventRepository(params: Partial<IEvent>): Promise<IEvent> {
     const { insertedId } = await MongoClient.db
-      .collection("PromoterEvent")
+      .collection("Event")
       .insertOne(params);
 
-    const promoterEvent = await MongoClient.db
-      .collection<Omit<IPromoterEvent, "id">>("PromoterEvent")
+    const foundedEvents = await MongoClient.db
+      .collection<Omit<IEvent, "id">>("Event")
       .findOne({ _id: insertedId });
 
-    if (!promoterEvent) {
-      throw new Error("PromoterEvent not found");
+    if (!foundedEvents) {
+      throw new Error("Event not found");
     }
 
-    const { _id, ...rest } = promoterEvent;
+    const { _id, ...rest } = foundedEvents;
 
     return {
       ...rest,
@@ -33,30 +27,28 @@ export class PromoterEventRepository implements IPromoterEventRepository {
     };
   }
 
-  async updatePromoterEventRepository(
-    params: Partial<IPromoterEvent>
-  ): Promise<IPromoterEvent> {
-    const promoterEvent = await this.searchPromoterEventRepository({
+  async updateEventRepository(params: Partial<IEvent>): Promise<IEvent> {
+    const searchedEvents = await this.searchEventRepository({
       id: params.id,
     });
 
-    if (promoterEvent.length > 0) {
-      throw new Error("PromoterEvent name already exists");
+    if (searchedEvents.length > 0) {
+      throw new Error("Event name already exists");
     }
 
-    const updatedPromoterEvent = await MongoClient.db
-      .collection<Omit<IPromoterEvent, "id">>("PromoterEvent")
+    const updatedEvent = await MongoClient.db
+      .collection<Omit<IEvent, "id">>("Event")
       .findOneAndUpdate(
         { id: params.id },
         { $set: params },
         { returnDocument: "after" }
       );
 
-    if (!updatedPromoterEvent) {
-      throw new Error("PromoterEvent not found");
+    if (!updatedEvent) {
+      throw new Error("Event not found");
     }
 
-    const { _id, ...rest } = updatedPromoterEvent;
+    const { _id, ...rest } = updatedEvent;
 
     return {
       ...rest,
@@ -64,31 +56,29 @@ export class PromoterEventRepository implements IPromoterEventRepository {
     };
   }
 
-  async searchPromoterEventRepository(
-    params?: ISearchPromoterEventQuerys
-  ): Promise<IPromoterEvent[]> {
+  async searchEventRepository(params?: ISearchEventQuerys): Promise<IEvent[]> {
     if (!params) {
-      const promoterEvents = await MongoClient.db
-        .collection<Omit<IPromoterEvent, "id">>("PromoterEvent")
+      const foundedEvents = await MongoClient.db
+        .collection<Omit<IEvent, "id">>("Event")
         .find({})
         .toArray();
 
-      return promoterEvents.map(({ _id, ...rest }) => ({
+      return foundedEvents.map(({ _id, ...rest }) => ({
         ...rest,
         id: _id.toHexString(),
       }));
     }
 
     if (params?.id) {
-      const promoterEvent = await MongoClient.db
-        .collection<Omit<IPromoterEvent, "id">>("PromoterEvent")
+      const foundedEvents = await MongoClient.db
+        .collection<Omit<IEvent, "id">>("Event")
         .findOne({ id: params.id });
 
-      if (!promoterEvent) {
+      if (!foundedEvents) {
         return [];
       }
 
-      const { _id, ...rest } = promoterEvent;
+      const { _id, ...rest } = foundedEvents;
 
       return [
         {
@@ -98,29 +88,27 @@ export class PromoterEventRepository implements IPromoterEventRepository {
       ];
     }
 
-    const promoterEvents = await MongoClient.db
-      .collection<Omit<IPromoterEvent, "id">>("PromoterEvent")
+    const foundedEvents = await MongoClient.db
+      .collection<Omit<IEvent, "id">>("Event")
       .find(params)
       .toArray();
 
-    return promoterEvents.map(({ _id, ...rest }) => ({
+    return foundedEvents.map(({ _id, ...rest }) => ({
       ...rest,
       id: _id.toHexString(),
     }));
   }
 
-  async deletePromoterEventRepository(
-    id: string
-  ): Promise<IPromoterEvent | null> {
-    const promoterEvent = await MongoClient.db
-      .collection<Omit<IPromoterEvent, "id">>("PromoterEvent")
+  async deleteEventRepository(id: string): Promise<IEvent | null> {
+    const deletedEvent = await MongoClient.db
+      .collection<Omit<IEvent, "id">>("Event")
       .findOneAndDelete({ _id: new ObjectId(id) });
 
-    if (!promoterEvent) {
+    if (!deletedEvent) {
       return null;
     }
 
-    const { _id, ...rest } = promoterEvent;
+    const { _id, ...rest } = deletedEvent;
 
     return {
       ...rest,
@@ -131,37 +119,37 @@ export class PromoterEventRepository implements IPromoterEventRepository {
   async confirmPresenceInEventRepository(
     userProfileId: string,
     eventUserProfileId: string
-  ): Promise<IPromoterEvent | null> {
+  ): Promise<IEvent | null> {
     const findUserProfileId = await MongoClient.db
       .collection<Omit<UserProfile, "id">>("UserProfile")
       .findOne({ _id: new ObjectId(userProfileId) });
 
-    const findPromoterEvent = await this.searchPromoterEventRepository({
+    const findEvent = await this.searchEventRepository({
       id: eventUserProfileId,
     });
 
-    if (findPromoterEvent.length === 0 || !findUserProfileId) {
+    if (findEvent.length === 0 || !findUserProfileId) {
       return null;
     }
 
     const userProfileAlredyConfirmed =
-      findPromoterEvent[0]?.userProfileConfirmationsInEvent;
+      findEvent[0]?.userProfileConfirmationsInEvent;
 
-    if (!findPromoterEvent[0].userProfileConfirmationsInEvent) {
+    if (!findEvent[0].userProfileConfirmationsInEvent) {
       return null;
     }
 
     const isFollowing = !!userProfileAlredyConfirmed
-      ? findPromoterEvent[0].userProfileConfirmationsInEvent.some(
-          (promoterEventUserProfileId: string) =>
-            promoterEventUserProfileId === eventUserProfileId
+      ? findEvent[0].userProfileConfirmationsInEvent.some(
+          (EventUserProfileId: string) =>
+            EventUserProfileId === eventUserProfileId
         )
       : false;
 
     if (isFollowing) {
       // Se estiver seguindo, remove o usuário da lista de following
       const updatedUserProfile = await MongoClient.db
-        .collection<Omit<IPromoterEvent, "id">>("PromoterEvent")
+        .collection<Omit<IEvent, "id">>("Event")
         .findOneAndUpdate(
           { id: eventUserProfileId },
           { $pull: { userProfileConfirmationsInEvent: userProfileId } },
@@ -181,7 +169,7 @@ export class PromoterEventRepository implements IPromoterEventRepository {
     } else {
       // Se não estiver seguindo, adiciona o usuário à lista de following
       const updatedUserProfile = await MongoClient.db
-        .collection<Omit<IPromoterEvent, "id">>("PromoterEvent")
+        .collection<Omit<IEvent, "id">>("Event")
         .findOneAndUpdate(
           { _id: new ObjectId(userProfileId) },
           { $addToSet: { userProfileConfirmationsInEvent: userProfileId } },

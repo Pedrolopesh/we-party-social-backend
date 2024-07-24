@@ -1,4 +1,4 @@
-export interface IPromoterEvent {
+export interface IEvent {
   id: string;
   nameEvent: string;
   eventMidia?: string[];
@@ -12,6 +12,7 @@ export interface IPromoterEvent {
   neighborhood: string;
   streat: string;
   streatNumber: string;
+  userProfileId: string;
   complement?: string;
   latitude?: string;
   longitude?: string;
@@ -27,7 +28,7 @@ export interface IPromoterEvent {
   userProfileConfirmationsInEvent?: string[];
 }
 
-export interface ISearchPromoterEventQuerys {
+export interface ISearchEventQuerys {
   id?: string;
   userProfileId?: string;
   nameEvent?: string;
@@ -46,43 +47,39 @@ export interface ISearchPromoterEventQuerys {
   eventReports?: string;
 }
 
-export interface PromoterEventController {
-  createPromoterEvent(
-    httpRequest: HttpRequest<Omit<IPromoterEvent, "id">>
-  ): Promise<HttpResponse<IPromoterEvent>>;
+export interface IEventController {
+  createEvent(
+    httpRequest: HttpRequest<Omit<IEvent, "id">>
+  ): Promise<HttpResponse<IEvent>>;
 
-  deletePromoterEvent(
+  deleteEvent(
     httpRequest: HttpRequest<{ id: string }>
-  ): Promise<HttpResponse<IPromoterEvent>>;
+  ): Promise<HttpResponse<IEvent>>;
 
-  searchPromoterEvents(
-    httpRequest: HttpRequest<ISearchPromoterEventQuerys>
-  ): Promise<HttpResponse<IPromoterEvent[]>>;
+  searchEvents(
+    httpRequest: HttpRequest<ISearchEventQuerys>
+  ): Promise<HttpResponse<IEvent[]>>;
 
-  updatePromoterEvent(
-    httpRequest: HttpRequest<Omit<IPromoterEvent, "id">>
-  ): Promise<HttpResponse<IPromoterEvent>>;
+  updateEvent(
+    httpRequest: HttpRequest<Omit<IEvent, "id">>
+  ): Promise<HttpResponse<IEvent>>;
 
   confirmPresenceInEvent(
     httpRequest: HttpRequest<{ userProfileId: string }>
-  ): Promise<HttpResponse<IPromoterEvent>>;
+  ): Promise<HttpResponse<IEvent>>;
 }
 
-export interface IPromoterEventRepository {
-  createPromoterEventRepository(
-    params: Omit<IPromoterEvent, "id">
-  ): Promise<IPromoterEvent>;
+export interface IEventRepository {
+  createEventRepository(params: Omit<IEvent, "id">): Promise<IEvent>;
 
-  deletePromoterEventRepository(id: string): Promise<PromoterEvent>;
+  deleteEventRepository(id: string): Promise<IEvent | null>;
 
-  searchPromoterEventRepository(
-    params: ISearchPromoterEventQuerys
-  ): Promise<PromoterEvent[]>;
+  searchEventRepository(params: ISearchEventQuerys): Promise<IEvent[]>;
 
-  updatePromoterEventRepository(params: PromoterEvent): Promise<PromoterEvent>;
+  updateEventRepository(params: Partial<IEvent>): Promise<IEvent>;
 
   confirmPresenceInEventRepository(
     userProfileId: string,
     eventUserProfileId: string
-  ): Promise<PromoterEvent | null>;
+  ): Promise<IEvent | null>;
 }
