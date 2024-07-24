@@ -140,6 +140,8 @@ export class UserProfileRepository implements IUserProfileRepository {
 
     const hasInterests = userProfile?.interest;
 
+    // TODO: it's necessary check if interest exists before add to user profile
+
     const isFollowing = !!hasInterests
       ? userProfile.interest.some((follow: string) => follow === interestId)
       : false;
