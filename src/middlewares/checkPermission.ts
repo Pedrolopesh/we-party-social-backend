@@ -28,6 +28,7 @@ export class PermissionMiddleware {
           /^\/api\/interest\/search(\?.*)?$/,
           /^\/api\/interest\/delete(\/[a-zA-Z0-9]+)?$/,
           /^\/api\/event\/create$/,
+          /^\/api\/event\/update$/,
         ],
         admin: [/^\/userprofile\/all$/],
         promoter: [/^\/userprofile\/all$/],

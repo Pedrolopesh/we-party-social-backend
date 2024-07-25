@@ -28,18 +28,10 @@ export class EventRepository implements IEventRepository {
   }
 
   async updateEventRepository(params: Partial<IEvent>): Promise<IEvent> {
-    const searchedEvents = await this.searchEventRepository({
-      id: params.id,
-    });
-
-    if (searchedEvents.length > 0) {
-      throw new Error("Event name already exists");
-    }
-
     const updatedEvent = await MongoClient.db
       .collection<Omit<IEvent, "id">>("Event")
       .findOneAndUpdate(
-        { id: params.id },
+        { _id: new ObjectId(params.id) },
         { $set: params },
         { returnDocument: "after" }
       );

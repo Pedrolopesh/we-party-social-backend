@@ -1,3 +1,4 @@
+import { InterestRepository } from "./../Interest/InterestRepository";
 import { UserProfileRepository } from "./../UserProfile/UserProfileRepository";
 import express from "express";
 const router = express.Router();
@@ -13,9 +14,11 @@ const permissionMiddleware = new PermissionMiddleware();
 
 const eventRepository = new EventRepository();
 const userProfileRepository = new UserProfileRepository();
+const interestRepository = new InterestRepository();
 const eventController = new EventController(
   eventRepository,
-  userProfileRepository
+  userProfileRepository,
+  interestRepository
 );
 
 router
@@ -27,6 +30,26 @@ router
     async (req, res) => {
       try {
         const { body, status } = await eventController.createEvent({
+          body: req.body,
+        });
+
+        res.status(status).send(body);
+      } catch (error: any) {
+        console.error(error);
+        res.status(500).send({ message: error.message });
+      }
+    }
+  );
+
+router
+  .route("/update")
+  .patch(
+    authMiddleware.validateToken,
+    permissionMiddleware.checkPermission.bind(permissionMiddleware),
+    interesntValidation.eventInputValidations,
+    async (req, res) => {
+      try {
+        const { body, status } = await eventController.updateEvent({
           body: req.body,
         });
 

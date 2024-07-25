@@ -6,11 +6,13 @@ import {
   ISearchEventQuerys,
 } from "./Event";
 import { IUserProfileRepository } from "controllers/UserProfile/UserProfile";
+import { IInterestRepository } from "controllers/Interest/Interest";
 
 export class EventController implements IEventController {
   constructor(
     private readonly eventRepository: IEventRepository,
-    private readonly userProfileRepository: IUserProfileRepository
+    private readonly userProfileRepository: IUserProfileRepository,
+    private readonly interestRepository: IInterestRepository
   ) {}
 
   async createEvent(
@@ -72,10 +74,10 @@ export class EventController implements IEventController {
       const { body } = httpRequest;
 
       if (!body) {
-        return Promise.resolve({
+        return {
           status: 400,
           body: "Body is required",
-        });
+        };
       }
 
       if (!body?.id) {
@@ -84,6 +86,47 @@ export class EventController implements IEventController {
           body: "Id is required",
         };
       }
+
+      const hasInteres =
+        body?.interest && body?.interest?.length > 0
+          ? await this.interestRepository.searchInterestRepository({
+              id: body.interest[0],
+            })
+          : [];
+
+      if (body?.interest && hasInteres.length === 0) {
+        return {
+          status: 400,
+          body: "Interest not found",
+        };
+      }
+
+      const hasUserProfile =
+        body?.userProfileConfirmationsInEvent &&
+        body?.userProfileConfirmationsInEvent?.length > 0
+          ? await this.userProfileRepository.findUserProfileById(
+              body.userProfileConfirmationsInEvent[0]
+            )
+          : null;
+
+      console.log(hasUserProfile);
+      if (body?.userProfileConfirmationsInEvent && !hasUserProfile) {
+        return {
+          status: 400,
+          body: "UserProfile not found",
+        };
+      }
+
+      // const findEvent = await this.eventRepository.searchEventRepository({
+      //   nameEvent: body.nameEvent,
+      // });
+
+      // if (findEvent.length > 0) {
+      //   return {
+      //     status: 400,
+      //     body: "Event already exists",
+      //   };
+      // }
 
       const event = await this.eventRepository.updateEventRepository(body);
 
