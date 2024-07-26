@@ -1,18 +1,12 @@
-import { ILoginExternalUserResponse } from "types/User";
-import { HttpRequest, HttpResponse } from "../protocols";
 import {
-  requestCreateExternalUser,
-  requestLoginExternalUser,
-} from "../../middlewares/requestExternalService";
-import {
-  CreateUserProfileParams,
   IUserProfileController,
-  IUserProfileRepository,
-  IUserProfileSearchParams,
-  LoginUserProfileParams,
-  UserProfile,
+  IUserProfileService,
 } from "controllers/UserProfile/UserProfile";
-import { IInterestRepository } from "controllers/Interest/Interest";
+import { Request, Response } from "express";
+import {
+  sendErrorResponse,
+  sendSuccessResponse,
+} from "../../utils/responseUtils";
 
 export interface IUserProfileInterestParams {
   userProfileId: string;
@@ -25,255 +19,122 @@ export interface IFollowUserInput {
 }
 
 export class UserProfileController implements IUserProfileController {
-  constructor(
-    private readonly userProfileRepository: IUserProfileRepository,
-    private readonly interestRepository?: IInterestRepository
-  ) {}
+  constructor(private readonly userProfileService: IUserProfileService) {}
 
-  async createUserProfile(
-    httpRequest: HttpRequest<CreateUserProfileParams>
-  ): Promise<HttpResponse<UserProfile>> {
+  async createUserProfile(req: Request, res: Response): Promise<void> {
     try {
-      const { body } = httpRequest;
+      const { body } = req;
 
       if (!body) {
-        return {
-          status: 400,
-          body: "Body is required",
-        };
+        sendErrorResponse(res, "Body is required", 400);
       }
 
-      const { password, ...mongoBody } = body;
+      const result = await this.userProfileService.createUserProfile(req.body);
+      sendSuccessResponse(res, result, 201);
 
-      const getUser = await this.userProfileRepository.findUserProfileByEmail(
-        mongoBody.email
-      );
-
-      if (getUser) {
-        return {
-          status: 400,
-          body: "User already exists",
-        };
-      }
-
-      const userProfile = await this.userProfileRepository.createUserProfile(
-        mongoBody
-      );
-
-      const createdSqlUser = await requestCreateExternalUser({
-        ...body,
-        password,
-        mongoUserId: userProfile.id,
-      });
-
-      if (!createdSqlUser) {
-        return {
-          status: 400,
-          body: "Body is required",
-        };
-      }
-
-      await this.userProfileRepository.updateUserProfile(userProfile.id, {
-        sqlUserId: createdSqlUser.userId,
-      });
-
-      const result: any = {
-        ...userProfile,
-        token: createdSqlUser.token,
-        tokenExpiresAt: createdSqlUser.tokenExpiresAt,
-      };
-
-      return {
-        status: 201,
-        body: result,
-      };
+      sendSuccessResponse(res, result, 201);
     } catch (error: any) {
-      console.log("error", error);
-      return {
-        status: 500,
-        body: error,
-      };
+      sendErrorResponse(res, error.message, 500);
     }
   }
 
-  async loginUserProfile(
-    httpRequest: HttpRequest<LoginUserProfileParams>
-  ): Promise<HttpResponse<ILoginExternalUserResponse>> {
-    const { body } = httpRequest;
+  async loginUserProfile(req: Request, res: Response): Promise<void> {
+    try {
+      const { body } = req;
 
-    if (!body) {
-      return {
-        status: 400,
-        body: "Body is required",
-      };
+      if (!body) {
+        sendErrorResponse(res, "Body is required", 400);
+      }
+
+      const result = await this.userProfileService.loginUserProfile(req.body);
+      sendSuccessResponse(res, result, 200);
+    } catch (error: any) {
+      sendErrorResponse(res, error.message, 500);
     }
-
-    const loginExternalUser = await requestLoginExternalUser({
-      email: body.email,
-      password: body.password,
-    });
-
-    if (loginExternalUser?.status !== 200) {
-      return {
-        status: loginExternalUser.status,
-        body: loginExternalUser,
-      };
-    }
-
-    return {
-      status: 200,
-      body: loginExternalUser,
-    };
   }
 
-  async deleteUserProfile(
-    httpRequest: HttpRequest<{ id: string }>
-  ): Promise<HttpResponse<UserProfile>> {
-    // TO DO: Colocar validação dos campos que são enviados pela requisição (se estão no formato correto, se estão vazios como uma sanitização dos dados que estão sendo enviados)
-    const { body } = httpRequest;
+  async updateUserProfile(req: Request, res: Response): Promise<void> {
+    try {
+      const { body } = req;
 
-    if (!body) {
-      return {
-        status: 400,
-        body: "body is required",
-      };
+      if (!body) {
+        sendErrorResponse(res, "Body is required", 400);
+      }
+
+      if (!body?.id) {
+        sendErrorResponse(res, "Id is required", 400);
+      }
+
+      const result = await this.userProfileService.updateUserProfile(req.body);
+      sendSuccessResponse(res, result, 200);
+    } catch (error: any) {
+      sendErrorResponse(res, error.message, 500);
     }
-
-    if (!body?.id) {
-      return {
-        status: 400,
-        body: "Id is required",
-      };
-    }
-
-    console.log("deleteUserProfile");
-    const userProfile = await this.userProfileRepository.deleteUserProfile(
-      body?.id
-    );
-
-    if (!userProfile) {
-      return {
-        status: 404,
-        body: "User not found",
-      };
-    }
-
-    return {
-      status: 200,
-      body: userProfile,
-    };
   }
 
-  async getAllUserProfiles(
-    _httpRequest: HttpRequest<IUserProfileSearchParams>
-  ): Promise<HttpResponse<UserProfile[]>> {
-    const userProfiles = await this.userProfileRepository.getAllUserProfiles();
+  async searchUserProfile(req: Request, res: Response): Promise<void> {
+    try {
+      const { body } = req;
 
-    return {
-      status: 200,
-      body: userProfiles,
-    };
+      if (!body) {
+        sendErrorResponse(res, "Body is required", 400);
+      }
+
+      const result = await this.userProfileService.searchUserProfile(req.body);
+      sendSuccessResponse(res, result, 200);
+    } catch (error: any) {
+      sendErrorResponse(res, error.message, 500);
+    }
   }
-  async addInterestToUserProfile(
-    httpRequest: HttpRequest<IUserProfileInterestParams>
-  ): Promise<HttpResponse<UserProfile | null>> {
-    const { body } = httpRequest;
 
-    if (!body) {
-      return {
-        status: 400,
-        body: "Body is required",
-      };
+  async deleteUserProfile(req: Request, res: Response): Promise<void> {
+    try {
+      const { body } = req;
+
+      if (!body) {
+        sendErrorResponse(res, "Body is required", 400);
+      }
+
+      if (!body?.id) {
+        sendErrorResponse(res, "Id is required", 400);
+      }
+
+      const result = await this.userProfileService.deleteUserProfile(req.body);
+      sendSuccessResponse(res, result, 201);
+    } catch (error: any) {
+      sendErrorResponse(res, error.message, 500);
     }
+  }
 
-    const userProfile = await this.userProfileRepository.findUserProfileById(
-      body.userProfileId
-    );
+  async addInterestToUserProfile(req: Request, res: Response): Promise<void> {
+    try {
+      const { body } = req;
 
-    if (!userProfile) {
-      return {
-        status: 400,
-        body: "User not found",
-      };
-    }
+      if (!body) {
+        sendErrorResponse(res, "Body is required", 400);
+      }
 
-    if (!this.interestRepository) {
-      return {
-        status: 400,
-        body: "Interest repository not found",
-      };
-    }
-
-    const interest = await this.interestRepository.searchInterestRepository({
-      id: body.interestId,
-    });
-
-    if (!interest) {
-      return {
-        status: 400,
-        body: "Interest not found",
-      };
-    }
-
-    const updatedInterest =
-      await this.userProfileRepository.addInterestToUserProfile(
-        body.userProfileId,
-        body.interestId
+      const result = await this.userProfileService.addInterestToUserProfile(
+        req.body
       );
-
-    if (!updatedInterest) {
-      return {
-        status: 400,
-        body: "Error adding interest",
-      };
+      sendSuccessResponse(res, result, 200);
+    } catch (error: any) {
+      sendErrorResponse(res, error.message, 500);
     }
-
-    return {
-      status: 200,
-      body: updatedInterest,
-    };
   }
 
-  async followUserProfile(
-    httpRequest: HttpRequest<IFollowUserInput>
-  ): Promise<HttpResponse<UserProfile | null>> {
-    const { body } = httpRequest;
+  async followUserProfile(req: Request, res: Response): Promise<void> {
+    try {
+      const { body } = req;
 
-    if (!body) {
-      return Promise.resolve({
-        status: 400,
-        body: "Body is required",
-      });
+      if (!body) {
+        sendErrorResponse(res, "Body is required", 400);
+      }
+
+      const result = await this.userProfileService.followUserProfile(req.body);
+      sendSuccessResponse(res, result, 200);
+    } catch (error: any) {
+      sendErrorResponse(res, error.message, 500);
     }
-
-    const findUserProfileFriend =
-      await this.userProfileRepository.findUserProfileById(
-        body.friendUserProfileId
-      );
-
-    if (!findUserProfileFriend) {
-      return {
-        status: 400,
-        body: "User not found",
-      };
-    }
-
-    const followUserProfile =
-      await this.userProfileRepository.followUserProfile(
-        body.friendUserProfileId,
-        body.userProfileId
-      );
-
-    if (!followUserProfile) {
-      return {
-        status: 400,
-        body: "Error following user",
-      };
-    }
-
-    return {
-      status: 200,
-      body: findUserProfileFriend,
-    };
   }
 }

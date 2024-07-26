@@ -1,272 +1,102 @@
 import { HttpRequest, HttpResponse } from "controllers/protocols";
+import { IEvent, IEventController, IEventService } from "./Event";
+import { Request, Response } from "express";
 import {
-  IEvent,
-  IEventController,
-  IEventRepository,
-  ISearchEventQuerys,
-} from "./Event";
-import { IUserProfileRepository } from "controllers/UserProfile/UserProfile";
-import { IInterestRepository } from "controllers/Interest/Interest";
+  sendErrorResponse,
+  sendSuccessResponse,
+} from "../../utils/responseUtils";
 
 export class EventController implements IEventController {
-  constructor(
-    private readonly eventRepository: IEventRepository,
-    private readonly userProfileRepository: IUserProfileRepository,
-    private readonly interestRepository: IInterestRepository
-  ) {}
+  constructor(private readonly eventService: IEventService) {}
 
-  async createEvent(
-    httpRequest: HttpRequest<IEvent>
-  ): Promise<HttpResponse<IEvent>> {
+  async createEvent(req: Request, res: Response): Promise<void> {
     try {
-      const { body } = httpRequest;
+      const { body } = req;
 
       if (!body) {
-        return Promise.resolve({
-          status: 400,
-          body: "Body is required",
-        });
+        sendErrorResponse(res, "Body is required", 400);
       }
 
-      const findEvent = await this.eventRepository.searchEventRepository({
-        nameEvent: body.nameEvent,
-      });
+      const event = await this.eventService.createEvent(body);
 
-      if (findEvent.length > 0) {
-        return {
-          status: 400,
-          body: "Event already exists",
-        };
-      }
-
-      const findUserProfile =
-        await this.userProfileRepository.findUserProfileById(
-          body.userProfileId
-        );
-
-      if (!findUserProfile) {
-        return {
-          status: 400,
-          body: "User not found",
-        };
-      }
-
-      const eventRepository = await this.eventRepository.createEventRepository(
-        body
-      );
-
-      return {
-        status: 200,
-        body: eventRepository,
-      };
+      sendSuccessResponse(res, event, 201);
     } catch (error: any) {
-      return {
-        status: 400,
-        body: error.message,
-      };
+      sendErrorResponse(res, error.message);
     }
   }
 
-  async updateEvent(
-    httpRequest: HttpRequest<Partial<IEvent>>
-  ): Promise<HttpResponse<IEvent>> {
+  async updateEvent(req: Request, res: Response): Promise<void> {
     try {
-      const { body } = httpRequest;
+      const { body } = req;
 
       if (!body) {
-        return {
-          status: 400,
-          body: "Body is required",
-        };
+        sendErrorResponse(res, "Body is required", 400);
       }
 
       if (!body?.id) {
-        return {
-          status: 400,
-          body: "Id is required",
-        };
+        sendErrorResponse(res, "Id is required", 400);
       }
 
-      const hasInteres =
-        body?.interest && body?.interest?.length > 0
-          ? await this.interestRepository.searchInterestRepository({
-              id: body.interest[0],
-            })
-          : [];
+      const event = await this.eventService.updateEvent(body);
 
-      if (body?.interest && hasInteres.length === 0) {
-        return {
-          status: 400,
-          body: "Interest not found",
-        };
-      }
-
-      const hasUserProfile =
-        body?.userProfileConfirmationsInEvent &&
-        body?.userProfileConfirmationsInEvent?.length > 0
-          ? await this.userProfileRepository.findUserProfileById(
-              body.userProfileConfirmationsInEvent[0]
-            )
-          : null;
-
-      console.log(hasUserProfile);
-      if (body?.userProfileConfirmationsInEvent && !hasUserProfile) {
-        return {
-          status: 400,
-          body: "UserProfile not found",
-        };
-      }
-
-      // const findEvent = await this.eventRepository.searchEventRepository({
-      //   nameEvent: body.nameEvent,
-      // });
-
-      // if (findEvent.length > 0) {
-      //   return {
-      //     status: 400,
-      //     body: "Event already exists",
-      //   };
-      // }
-
-      const event = await this.eventRepository.updateEventRepository(body);
-
-      if (!event) {
-        return {
-          status: 404,
-          body: "Event not found",
-        };
-      }
-
-      return {
-        status: 200,
-        body: event,
-      };
+      sendSuccessResponse(res, event, 200);
     } catch (err: any) {
-      return {
-        status: 400,
-        body: err.message,
-      };
+      sendErrorResponse(res, err.message, 400);
     }
   }
 
-  async searchEvents(
-    httpRequest: HttpRequest<ISearchEventQuerys>
-  ): Promise<HttpResponse<IEvent | IEvent[]>> {
+  async searchEvents(req: Request, res: Response): Promise<void> {
     try {
-      const { body } = httpRequest;
+      const { body } = req;
 
       if (!body) {
-        return Promise.resolve({
-          status: 400,
-          body: "Body is required",
-        });
+        sendErrorResponse(res, "Body is required", 400);
       }
 
-      const findEvent = await this.eventRepository.searchEventRepository({
-        ...(body.nameEvent && { name: body.nameEvent }),
-        ...(body.id && { id: body.id }),
-      });
+      const event = await this.eventService.searchEvents(body);
 
-      if (!findEvent) {
-        return {
-          status: 400,
-          body: "Event not found",
-        };
-      }
-
-      const event = await this.eventRepository.searchEventRepository(body);
-
-      if (!event) {
-        return {
-          status: 400,
-          body: "Error searching event",
-        };
-      }
-
-      return {
-        status: 200,
-        body: event,
-      };
+      sendSuccessResponse(res, event, 200);
     } catch (error) {
-      return {
-        status: 400,
-        body: "Error searching event",
-      };
+      sendErrorResponse(res, "Error searching event", 400);
     }
   }
 
-  async deleteEvent(
-    httpRequest: HttpRequest<{ id: string }>
-  ): Promise<HttpResponse<IEvent | null>> {
+  async deleteEvent(req: Request, res: Response): Promise<void> {
     try {
-      const { body } = httpRequest;
+      const { body } = req;
 
       if (!body) {
-        return Promise.resolve({
-          status: 400,
-          body: "Body is required",
-        });
+        sendErrorResponse(res, "Body is required", 400);
       }
 
-      const event = await this.eventRepository.deleteEventRepository(body.id);
-
-      if (!event) {
-        return {
-          status: 404,
-          body: "Event not found",
-        };
+      if (!body?.id) {
+        sendErrorResponse(res, "Id is required", 400);
       }
 
-      return {
-        status: 200,
-        body: event,
-      };
-    } catch (error) {
-      return {
-        status: 400,
-        body: "Error deleting event",
-      };
+      const event = await this.eventService.deleteEvent(body.id);
+
+      sendSuccessResponse(res, event, 201);
+    } catch (err: any) {
+      sendErrorResponse(res, err.message, 400);
     }
   }
 
-  async confirmPresenceInEvent(
-    httpRequest: HttpRequest<{
-      userProfileId: string;
-      eventUserProfileId: string;
-    }>
-  ): Promise<HttpResponse<IEvent>> {
+  async confirmPresenceInEvent(req: Request, res: Response): Promise<void> {
     try {
-      const { body } = httpRequest;
+      const { body } = req;
 
       if (!body) {
-        return Promise.resolve({
-          status: 400,
-          body: "Body is required",
-        });
+        sendErrorResponse(res, "Body is required", 400);
       }
 
-      const updatedEvent =
-        await this.eventRepository.confirmPresenceInEventRepository(
-          body.userProfileId,
-          body.eventUserProfileId
-        );
+      const updatedEvent = await this.eventService.confirmPresenceInEvent(
+        body.userProfileId,
+        body.eventUserProfileId
+      );
 
-      if (!updatedEvent) {
-        return {
-          status: 400,
-          body: "Error confirming presence in event",
-        };
-      }
-
-      return {
-        status: 200,
-        body: updatedEvent,
-      };
-    } catch (error) {
-      return {
-        status: 400,
-        body: "Error confirming presence in event",
-      };
+      sendSuccessResponse(res, updatedEvent, 200);
+    } catch (err: any) {
+      sendErrorResponse(res, err.message, 400);
     }
   }
 }

@@ -1,6 +1,7 @@
 import { HttpRequest, HttpResponse } from "controllers/protocols";
+import { Request, Response } from "express";
 
-export interface UserProfile {
+export interface IUserProfile {
   id: string;
   name: string;
   username: string;
@@ -61,47 +62,67 @@ export interface IUserProfileInterestParams {
 }
 
 export interface IUserProfileController {
-  createUserProfile(
-    httpRequest: HttpRequest<CreateUserProfileParams>
-  ): Promise<HttpResponse<UserProfile>>;
+  createUserProfile(req: Request, res: Response): Promise<void>;
 
-  deleteUserProfile(
-    httpRequest: HttpRequest<{ id: string }>
-  ): Promise<HttpResponse<UserProfile>>;
+  loginUserProfile(req: Request, res: Response): Promise<void>;
 
-  getAllUserProfiles(
-    httpRequest: HttpRequest<IUserProfileSearchParams>
-  ): Promise<HttpResponse<UserProfile[]>>;
+  updateUserProfile(req: Request, res: Response): Promise<void>;
 
-  addInterestToUserProfile(
-    httpRequest: HttpRequest<IUserProfileInterestParams>
-  ): Promise<HttpResponse<UserProfile | null>>;
+  searchUserProfile(req: Request, res: Response): Promise<void>;
 
-  followUserProfile(
-    httpRequest: HttpRequest<IFollowUserInput>
-  ): Promise<HttpResponse<UserProfile | null>>;
+  deleteUserProfile(req: Request, res: Response): Promise<void>;
+
+  addInterestToUserProfile(req: Request, res: Response): Promise<void>;
+
+  followUserProfile(req: Request, res: Response): Promise<void>;
 }
 
 export interface IUserProfileRepository {
   createUserProfile(
     params: CreateUserProfileParams<Omit<password>>
-  ): Promise<UserProfile>;
-  getAllUserProfiles(params?: IUserProfileSearchParams): Promise<UserProfile[]>;
-  findUserProfileById(id: string): Promise<UserProfile | null>;
-  findUserProfileByEmail(email: string): Promise<UserProfile | null>;
+  ): Promise<IUserProfile>;
+
   updateUserProfile(
     id: string,
     params: IUpdateUserProfileParams
-  ): Promise<UserProfile>;
-  deleteUserProfile(id: string): Promise<UserProfile | null>;
+  ): Promise<IUserProfile>;
+  deleteUserProfile(id: string): Promise<IUserProfile | null>;
 
   addInterestToUserProfile(
     userProfileId: string,
     interestId: string
-  ): Promise<UserProfile | null>;
+  ): Promise<IUserProfile | null>;
 
   followUserProfile(
     userProfileId: string,
     friendUserProfileId: string
-  ): Promise<UserProfile | null>;
+  ): Promise<IUserProfile | null>;
+
+  findUserProfileById(id: string): Promise<IUserProfile | null>;
+
+  findUserProfileByEmail(email: string): Promise<IUserProfile | null>;
+
+  searchUserProfile(params?: IUserProfileSearchParams): Promise<IUserProfile[]>;
+}
+
+export interface IUserProfileService {
+  createUserProfile(body: CreateUserProfileParams): Promise<IUserProfile>;
+
+  deleteUserProfile(id: string): Promise<IUserProfile | null>;
+
+  searchUserProfile(
+    body: ISearchEventQuerys
+  ): Promise<IUserProfile[] | IUserProfile>;
+
+  updateUserProfile(body: Partial<IUserProfile>): Promise<IUserProfile>;
+
+  loginUserProfile(
+    body: Partial<IUserProfile>
+  ): Promise<ILoginExternalUserResponse>;
+
+  addInterestToUserProfile(
+    params: IUserProfileInterestParams
+  ): Promise<IUserProfile | null>;
+
+  followUserProfile(params: IFollowUserInput): Promise<IUserProfile | null>;
 }

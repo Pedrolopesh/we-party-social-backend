@@ -10,6 +10,7 @@ import { AuthMiddleware } from "../../middlewares/auth";
 import { InteresntValidation } from "../../controllers/Interest/InterestValidation";
 import { PermissionMiddleware } from "../../middlewares/checkPermission";
 import { InterestRepository } from "../../controllers/Interest/InterestRepository";
+import { UserProfileService } from "./userProfileService";
 
 const authMiddleware = new AuthMiddleware();
 const interesntValidation = new InteresntValidation();
@@ -19,40 +20,25 @@ const userProfileValidation = new UserProfileValidation();
 const userProfileRepository = new UserProfileRepository();
 const interestRepository = new InterestRepository();
 
-const userProfileController = new UserProfileController(
+const userService = new UserProfileService(
   userProfileRepository,
   interestRepository
 );
 
+const userProfileController = new UserProfileController(userService);
+
 router
   .route("/create")
-  .post(userProfileValidation.userInputValidations, async (req, res) => {
-    try {
-      const { body, status } = await userProfileController.createUserProfile({
-        body: req.body,
-      });
+  .post(
+    userProfileValidation.userInputValidations,
+    async (req, res) => await userProfileController.createUserProfile(req, res)
+  );
 
-      res.status(status).send(body);
-    } catch (error) {
-      console.error(error);
-      res
-        .status(500)
-        .send({ message: "Internal server error in create route" });
-    }
-  });
-
-router.route("/login").post(async (req, res) => {
-  try {
-    const { body, status } = await userProfileController.loginUserProfile({
-      body: req.body,
-    });
-
-    res.status(status).send(body);
-  } catch (error) {
-    console.error(error);
-    res.status(500).send({ message: `Internal server error in login route` });
-  }
-});
+router
+  .route("/login")
+  .post(
+    async (req, res) => await userProfileController.loginUserProfile(req, res)
+  );
 
 router
   .route("/add/interest")
@@ -60,19 +46,8 @@ router
     authMiddleware.validateToken,
     permissionMiddleware.checkPermission.bind(permissionMiddleware),
     interesntValidation.addInterestInputValidations,
-    async (req, res) => {
-      try {
-        const { body, status } =
-          await userProfileController.addInterestToUserProfile({
-            body: req.body,
-          });
-
-        res.status(status).send(body);
-      } catch (error: any) {
-        console.error(error);
-        res.status(500).send({ message: error?.message });
-      }
-    }
+    async (req, res) =>
+      await userProfileController.addInterestToUserProfile(req, res)
   );
 
 router
@@ -81,18 +56,7 @@ router
     authMiddleware.validateToken,
     permissionMiddleware.checkPermission.bind(permissionMiddleware),
     interesntValidation.followInputValidations,
-    async (req, res) => {
-      try {
-        const { body, status } = await userProfileController.followUserProfile({
-          body: req.body,
-        });
-
-        res.status(status).send(body);
-      } catch (error: any) {
-        console.error(error);
-        res.status(500).send({ message: error?.message });
-      }
-    }
+    async (req, res) => await userProfileController.followUserProfile(req, res)
   );
 // ============= PROTECTED ROUTES =============
 
@@ -105,27 +69,11 @@ router
     }
   );
 
-router.route("/all").get(async (req, res) => {
-  const { body, status } = await userProfileController.getAllUserProfiles({
-    body: req.params,
-  });
-
-  res.status(status).send(body);
-});
-
-router.route("/delete/:id").delete(async (req, res) => {
-  const userProfileRepository = new UserProfileRepository();
-
-  const userProfileController = new UserProfileController(
-    userProfileRepository
+router
+  .route("/delete/:id")
+  .delete(
+    async (req, res) => await userProfileController.deleteUserProfile(req, res)
   );
-
-  const { body, status } = await userProfileController.deleteUserProfile({
-    body: req.params,
-  });
-
-  res.status(status).send(body);
-});
 
 router.route("/delete/masive").get(async (req, res) => {
   console.log("delete/masive");
