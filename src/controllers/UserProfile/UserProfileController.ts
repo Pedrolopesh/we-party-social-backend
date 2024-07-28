@@ -22,6 +22,7 @@ export class UserProfileController implements IUserProfileController {
   constructor(private readonly userProfileService: IUserProfileService) {}
 
   async createUserProfile(req: Request, res: Response): Promise<void> {
+    console.log("createUserProfile - api/userprofile/create");
     try {
       const { body } = req;
 
@@ -31,9 +32,8 @@ export class UserProfileController implements IUserProfileController {
 
       const result = await this.userProfileService.createUserProfile(req.body);
       sendSuccessResponse(res, result, 201);
-
-      sendSuccessResponse(res, result, 201);
     } catch (error: any) {
+      console.log("error", error.message);
       sendErrorResponse(res, error.message, 500);
     }
   }

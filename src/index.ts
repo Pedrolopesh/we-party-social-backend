@@ -8,6 +8,8 @@ import { MongoClient } from "./database/mongo";
 import { config } from "dotenv";
 import routes from "./routes";
 
+const app = express();
+
 const main = async () => {
   config();
   const app = express();
@@ -41,3 +43,5 @@ const main = async () => {
 };
 
 main();
+
+export { app };

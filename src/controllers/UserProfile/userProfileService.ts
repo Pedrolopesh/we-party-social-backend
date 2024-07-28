@@ -67,6 +67,8 @@ export class UserProfileService implements IUserProfileService {
       tokenExpiresAt: createdSqlUser.tokenExpiresAt,
     };
 
+    console.log("result", result);
+
     return result;
   }
 
