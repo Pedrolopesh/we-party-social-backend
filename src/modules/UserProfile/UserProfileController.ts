@@ -22,7 +22,6 @@ export class UserProfileController implements IUserProfileController {
   constructor(private readonly userProfileService: IUserProfileService) {}
 
   async createUserProfile(req: Request, res: Response): Promise<void> {
-    console.log("createUserProfile - api/userprofile/create");
     try {
       const { body } = req;
 

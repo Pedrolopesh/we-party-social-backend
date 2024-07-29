@@ -8,6 +8,7 @@ module.exports = {
   moduleFileExtensions: ["ts", "js", "json", "node"],
   coverageDirectory: "coverage",
   coverageReporters: ["text", "lcov"],
+  maxRetries: 0,
   // clearMocks: true,
   // collectCoverage: true,
   // collectCoverageFrom: ["src/**/*.ts"],
