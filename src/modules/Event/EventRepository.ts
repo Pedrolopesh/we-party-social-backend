@@ -1,7 +1,12 @@
 import { ObjectId } from "mongodb";
 import { MongoClient } from "../../database/mongo";
 
-import { IEvent, IEventRepository, ISearchEventQuerys } from "./Event";
+import {
+  IEvent,
+  IEventRepository,
+  IRemoveCommentInEvent,
+  ISearchEventQuerys,
+} from "./Event";
 import { IUserProfile } from "../UserProfile/UserProfile";
 
 export class EventRepository implements IEventRepository {
@@ -178,5 +183,28 @@ export class EventRepository implements IEventRepository {
         id: _id.toHexString(),
       };
     }
+  }
+
+  async removeCommentInEvent(
+    params: IRemoveCommentInEvent
+  ): Promise<IEvent | null> {
+    const updatedEvent = await MongoClient.db
+      .collection<Omit<IEvent, "id">>("Event")
+      .findOneAndUpdate(
+        { _id: new ObjectId(params.eventId) },
+        { $pull: { comments: params.commentId } },
+        { returnDocument: "after" }
+      );
+
+    if (!updatedEvent) {
+      return null;
+    }
+
+    const { _id, ...rest } = updatedEvent;
+
+    return {
+      ...rest,
+      id: _id.toHexString(),
+    };
   }
 }
