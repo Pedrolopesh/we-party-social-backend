@@ -5,8 +5,8 @@ import {
   IEventService,
   ISearchEventQuerys,
 } from "./Event";
-import { IUserProfileRepository } from "controllers/UserProfile/UserProfile";
-import { IInterestRepository } from "controllers/Interest/Interest";
+import { IUserProfileRepository } from "../UserProfile/UserProfile";
+import { IInterestRepository } from "../Interest/Interest";
 
 export class EventService implements IEventService {
   constructor(

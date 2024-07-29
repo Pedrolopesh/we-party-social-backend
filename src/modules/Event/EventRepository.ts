@@ -2,8 +2,7 @@ import { ObjectId } from "mongodb";
 import { MongoClient } from "../../database/mongo";
 
 import { IEvent, IEventRepository, ISearchEventQuerys } from "./Event";
-import { param } from "express-validator";
-import { IUserProfile } from "controllers/UserProfile/UserProfile";
+import { IUserProfile } from "../UserProfile/UserProfile";
 
 export class EventRepository implements IEventRepository {
   async createEventRepository(params: Partial<IEvent>): Promise<IEvent> {

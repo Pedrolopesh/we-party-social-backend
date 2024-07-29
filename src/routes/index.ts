@@ -1,8 +1,8 @@
 import express from "express";
 
-import routesUserProfile from "../controllers/UserProfile/routesUserProfile";
-import interestRoutes from "../controllers/Interest/InterestRoutes";
-import eventRoutes from "../controllers/Event/EventRoutes";
+import routesUserProfile from "../modules/UserProfile/routesUserProfile";
+import interestRoutes from "../modules/Interest/InterestRoutes";
+import eventRoutes from "../modules/Event/EventRoutes";
 
 const router = express.Router();
 

@@ -7,9 +7,9 @@ import { UserProfileController } from "./UserProfileController";
 import { removeMassiveUsers } from "../../local-helprs/remove-massive";
 
 import { AuthMiddleware } from "../../middlewares/auth";
-import { InteresntValidation } from "../../controllers/Interest/InterestValidation";
+import { InteresntValidation } from "../../modules/Interest/InterestValidation";
 import { PermissionMiddleware } from "../../middlewares/checkPermission";
-import { InterestRepository } from "../../controllers/Interest/InterestRepository";
+import { InterestRepository } from "../../modules/Interest/InterestRepository";
 import { UserProfileService } from "./userProfileService";
 
 const authMiddleware = new AuthMiddleware();

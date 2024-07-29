@@ -1,4 +1,4 @@
-import { UserProfileRepository } from "../controllers/UserProfile/UserProfileRepository";
+import { UserProfileRepository } from "../modules/UserProfile/UserProfileRepository";
 import { Request, Response, NextFunction } from "express";
 import { requestCheckUserProfileRole } from "./requestExternalService";
 

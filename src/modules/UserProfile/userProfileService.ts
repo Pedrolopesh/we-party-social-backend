@@ -5,8 +5,8 @@ import {
   IUserProfileSearchParams,
   IUserProfileService,
   LoginUserProfileParams,
-} from "../../controllers/UserProfile/UserProfile";
-import { IInterestRepository } from "controllers/Interest/Interest";
+} from "../../modules/UserProfile/UserProfile";
+import { IInterestRepository } from "../Interest/Interest";
 import {
   requestCreateExternalUser,
   requestLoginExternalUser,

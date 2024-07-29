@@ -1,7 +1,7 @@
 import {
   IUserProfileController,
   IUserProfileService,
-} from "controllers/UserProfile/UserProfile";
+} from "../UserProfile/UserProfile";
 import { Request, Response } from "express";
 import {
   sendErrorResponse,

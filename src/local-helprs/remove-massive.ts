@@ -1,5 +1,5 @@
 import axios from "axios";
-import { IUserProfile } from "../controllers/UserProfile/UserProfile";
+import { IUserProfile } from "../modules/UserProfile/UserProfile";
 
 export const removeMassiveUsers = async () => {
   try {

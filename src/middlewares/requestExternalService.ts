@@ -5,9 +5,7 @@ import {
   IUserProfileRoleResponse,
 } from "types/User";
 import axios from "axios";
-import { ICreatedExternalUser } from "controllers/UserProfile/UserProfile";
-import { HttpResponse } from "controllers/protocols";
-import { header } from "express-validator";
+import { ICreatedExternalUser } from "../modules/UserProfile/UserProfile";
 
 const port = process.env.EXTERNAL_SERVICE_PORT || 8000;
 

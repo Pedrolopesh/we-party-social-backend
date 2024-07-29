@@ -1,4 +1,4 @@
-import { HttpRequest, HttpResponse } from "controllers/protocols";
+import { HttpRequest, HttpResponse } from "../protocols";
 import { Request, Response } from "express";
 
 export interface IUserProfile {

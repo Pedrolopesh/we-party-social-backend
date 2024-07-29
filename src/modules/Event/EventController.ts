@@ -1,4 +1,3 @@
-import { HttpRequest, HttpResponse } from "controllers/protocols";
 import { IEvent, IEventController, IEventService } from "./Event";
 import { Request, Response } from "express";
 import {
