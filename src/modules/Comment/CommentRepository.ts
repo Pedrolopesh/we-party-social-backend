@@ -41,43 +41,43 @@ export class CommentRepository implements ICommentRepository {
     };
   }
 
+  async searchAllCommentsRepository(): Promise<IComment[]> {
+    const foundedComments = await MongoClient.db
+      .collection<Omit<IComment, "id">>("Comment")
+      .find({})
+      .toArray();
+
+    return foundedComments.map(({ _id, ...rest }) => ({
+      ...rest,
+      id: _id.toHexString(),
+    }));
+  }
+
+  async searchCommentByIdRepository(id: string): Promise<IComment | null> {
+    const foundedComment = await MongoClient.db
+      .collection<Omit<IComment, "id">>("Comment")
+      .findOne({ _id: new ObjectId(id) });
+
+    if (!foundedComment) {
+      return null;
+    }
+
+    const { _id, ...rest } = foundedComment;
+
+    return {
+      ...rest,
+      id: _id.toHexString(),
+    };
+  }
+
   async searchCommentRepository(
     querys: ISearchCommentQuerys
   ): Promise<IComment[]> {
-    if (!querys) {
-      const foundedComments = await MongoClient.db
-        .collection<Omit<IComment, "id">>("Comment")
-        .find({})
-        .toArray();
-
-      return foundedComments.map(({ _id, ...rest }) => ({
-        ...rest,
-        id: _id.toHexString(),
-      }));
-    }
-
-    if (querys.id) {
-      const foundedComment = await MongoClient.db
-        .collection<Omit<IComment, "id">>("Comment")
-        .findOne({ _id: new ObjectId(querys.id) });
-
-      if (!foundedComment) {
-        return [];
-      }
-
-      const { _id, ...rest } = foundedComment;
-
-      return [
-        {
-          ...rest,
-          id: _id.toHexString(),
-        },
-      ];
-    }
-
     const foundedComments = await MongoClient.db
       .collection<Omit<IComment, "id">>("Comment")
-      .find(querys)
+      .find({
+        userProfile: querys.userProfile,
+      })
       .toArray();
 
     return foundedComments.map(({ _id, ...rest }) => ({

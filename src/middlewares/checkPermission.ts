@@ -32,6 +32,7 @@ export class PermissionMiddleware {
           /^\/api\/comment\/create$/,
           /^\/api\/comment\/update$/,
           /^\/api\/comment\/delete(\/[a-zA-Z0-9]+)?$/,
+          /^\/api\/comment\/search(\?.*)?$/,
         ],
         admin: [/^\/userprofile\/all$/],
         promoter: [/^\/userprofile\/all$/],

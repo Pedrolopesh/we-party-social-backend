@@ -10,7 +10,8 @@ export interface IComment {
 
 export interface ISearchCommentQuerys {
   id?: string;
-  commentText?: string;
+  commentedEvent?: string;
+  userProfile?: string;
 }
 
 export interface ILikeCommentBody {
@@ -52,4 +53,8 @@ export interface ICommentRepository {
   updateCommentRepository(params: Partial<IComment>): Promise<IComment>;
 
   likeCommentRepository(id: string, userProfileId: string): Promise<IComment>;
+
+  searchAllCommentsRepository(): Promise<IComment[]>;
+
+  searchCommentByIdRepository(id: string): Promise<IComment | null>;
 }

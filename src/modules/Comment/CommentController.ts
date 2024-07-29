@@ -46,13 +46,11 @@ export class CommentController implements ICommentController {
 
   async searchComment(req: Request, res: Response): Promise<void> {
     try {
-      const { body } = req;
+      const querys = req.query;
 
-      if (!body) {
-        sendErrorResponse(res, "Body is required", 400);
-      }
+      // console.log("querys", querys.userProfileId);
 
-      const event = await this.eventService.searchCommentService(body);
+      const event = await this.eventService.searchCommentService(querys);
 
       sendSuccessResponse(res, event, 200);
     } catch (error) {

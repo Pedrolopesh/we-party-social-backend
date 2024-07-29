@@ -98,6 +98,17 @@ export class CommentService implements ICommentService {
   async searchCommentService(
     querys: ISearchCommentQuerys
   ): Promise<IComment[]> {
+    if (!querys) {
+      return await this.commentRepository.searchAllCommentsRepository();
+    }
+
+    if (querys.id) {
+      const foundedComment =
+        await this.commentRepository.searchCommentByIdRepository(querys.id);
+
+      return foundedComment ? [foundedComment] : [];
+    }
+
     return this.commentRepository.searchCommentRepository(querys);
   }
 

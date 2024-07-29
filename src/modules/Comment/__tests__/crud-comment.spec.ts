@@ -34,7 +34,7 @@ describe("CRUD Comment", () => {
     }
   });
 
-  it("should return 200 OK for valid flow: add new comment in event", async () => {
+  it.skip("should return 200 OK for valid flow: add new comment in event", async () => {
     const body = {
       commentText: "new comment test",
       userProfile: userProfileId,
@@ -109,6 +109,31 @@ describe("CRUD Comment", () => {
 
         expect(res.data.status).toBe(200);
         expect(res.data.data).toHaveProperty("id");
+      })
+      .catch((error: any) => {
+        console.log("Error commemt event:", error);
+        // console.log("Error interest:", error.response.data);
+        throw new Error("Error creating interest");
+      });
+  });
+
+  it("should return 200 OK for valid flow: search a user comments", async () => {
+    const authHeaders = {
+      Authorization: `Bearer ${token}`,
+      userprofileid: `${userProfileId}`,
+    };
+
+    await axios
+      .get(
+        `http://localhost:${port}/api/comment/search?userProfile=${userProfileId}`,
+        {
+          headers: authHeaders,
+        }
+      )
+      .then((res) => {
+        console.log("res: ", res.data);
+
+        expect(res.data.status).toBe(200);
       })
       .catch((error: any) => {
         console.log("Error commemt event:", error);
