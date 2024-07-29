@@ -3,6 +3,7 @@ import express from "express";
 import routesUserProfile from "../modules/UserProfile/routesUserProfile";
 import interestRoutes from "../modules/Interest/InterestRoutes";
 import eventRoutes from "../modules/Event/EventRoutes";
+import commentRoutes from "../modules/Comment/CommentRoutes";
 
 const router = express.Router();
 
@@ -19,5 +20,6 @@ router.route("/").get(async (_req, res) => {
 router.use("/userprofile", routesUserProfile);
 router.use("/interest", interestRoutes);
 router.use("/event", eventRoutes);
+router.use("/comment", commentRoutes);
 
 export default router;

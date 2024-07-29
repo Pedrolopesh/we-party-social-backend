@@ -67,8 +67,6 @@ router
     interesntValidation.interestSearchParamsValidations,
     async (req, res) => {
       try {
-        console.log("req.params", req.query);
-
         const { body, status } = await interestController.serachInterest({
           body: req.query,
         });

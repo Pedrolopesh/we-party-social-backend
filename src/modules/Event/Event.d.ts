@@ -49,6 +49,11 @@ export interface ISearchEventQuerys {
   eventReports?: string;
 }
 
+export interface IRemoveCommentInEvent {
+  eventId: string;
+  commentId: string;
+}
+
 export interface IEventController {
   createEvent(req: Request, res: Response): Promise<void>;
 
@@ -74,6 +79,8 @@ export interface IEventRepository {
     userProfileId: string,
     eventUserProfileId: string
   ): Promise<IEvent | null>;
+
+  removeCommentInEvent(params: IRemoveCommentInEvent): Promise<IEvent | null>;
 }
 
 export interface IEventService {
