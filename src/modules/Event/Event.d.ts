@@ -1,3 +1,5 @@
+import { Request, Response } from "express";
+
 export interface IEvent {
   id: string;
   nameEvent: string;
@@ -48,25 +50,15 @@ export interface ISearchEventQuerys {
 }
 
 export interface IEventController {
-  createEvent(
-    httpRequest: HttpRequest<Omit<IEvent, "id">>
-  ): Promise<HttpResponse<IEvent>>;
+  createEvent(req: Request, res: Response): Promise<void>;
 
-  deleteEvent(
-    httpRequest: HttpRequest<{ id: string }>
-  ): Promise<HttpResponse<IEvent>>;
+  updateEvent(req: Request, res: Response): Promise<void>;
 
-  searchEvents(
-    httpRequest: HttpRequest<ISearchEventQuerys>
-  ): Promise<HttpResponse<IEvent[]>>;
+  deleteEvent(req: Request, res: Response): Promise<void>;
 
-  updateEvent(
-    httpRequest: HttpRequest<Omit<IEvent, "id">>
-  ): Promise<HttpResponse<IEvent>>;
+  searchEvents(req: Request, res: Response): Promise<void>;
 
-  confirmPresenceInEvent(
-    httpRequest: HttpRequest<{ userProfileId: string }>
-  ): Promise<HttpResponse<IEvent>>;
+  confirmPresenceInEvent(req: Request, res: Response): Promise<void>;
 }
 
 export interface IEventRepository {
@@ -82,4 +74,19 @@ export interface IEventRepository {
     userProfileId: string,
     eventUserProfileId: string
   ): Promise<IEvent | null>;
+}
+
+export interface IEventService {
+  createEvent(body: Omit<IEvent, "id">): Promise<IEvent>;
+
+  deleteEvent(id: string): Promise<IEvent | null>;
+
+  searchEvents(body: ISearchEventQuerys): Promise<IEvent[] | IEvent>;
+
+  updateEvent(body: Partial<IEvent>): Promise<IEvent>;
+
+  confirmPresenceInEvent(
+    userProfileId: string,
+    eventUserProfileId: string
+  ): Promise<IEvent | string>;
 }

@@ -5,27 +5,27 @@ import {
   IUserProfileRoleResponse,
 } from "types/User";
 import axios from "axios";
-import { ICreatedExternalUser } from "controllers/UserProfile/UserProfile";
-import { HttpResponse } from "controllers/protocols";
-import { header } from "express-validator";
+import { ICreatedExternalUser } from "../modules/UserProfile/UserProfile";
 
-const port = process.env.EXTERNAL_SERVICE_PORT || 8000;
+const port = process.env.EXTERNAL_SERVICE_PORT || 8080;
 
 export const requestCreateExternalUser = async (
   params: ICreateExternalUserParams
 ): Promise<ICreatedExternalUser> => {
-  const { data, status } = await axios.post(
-    `http://localhost:${port}/api/users/create`,
-    params
-  );
+  try {
+    const { data, status } = await axios.post(
+      `http://localhost:${port}/api/users/create`,
+      params
+    );
 
-  console.log(data, status);
+    const createdExternalUserResponse: ICreatedExternalUser = {
+      ...data,
+    };
 
-  const createdExternalUserResponse: ICreatedExternalUser = {
-    ...data,
-  };
-
-  return createdExternalUserResponse;
+    return createdExternalUserResponse;
+  } catch (err: any) {
+    throw new Error(err?.response?.data || "Error creating external user");
+  }
 };
 
 export const requestLoginExternalUser = async (
@@ -36,7 +36,6 @@ export const requestLoginExternalUser = async (
       `http://localhost:${port}/api/users/login`,
       params
     );
-
     return {
       status: 200,
       response: {
@@ -48,7 +47,6 @@ export const requestLoginExternalUser = async (
       },
     };
   } catch (error: any) {
-    console.log("error", error?.response);
     return {
       status: error?.response?.status,
       response: error?.response?.data,

@@ -2,8 +2,7 @@ import { ObjectId } from "mongodb";
 import { MongoClient } from "../../database/mongo";
 
 import { IEvent, IEventRepository, ISearchEventQuerys } from "./Event";
-import { param } from "express-validator";
-import { UserProfile } from "controllers/UserProfile/UserProfile";
+import { IUserProfile } from "../UserProfile/UserProfile";
 
 export class EventRepository implements IEventRepository {
   async createEventRepository(params: Partial<IEvent>): Promise<IEvent> {
@@ -113,7 +112,7 @@ export class EventRepository implements IEventRepository {
     eventUserProfileId: string
   ): Promise<IEvent | null> {
     const findUserProfileId = await MongoClient.db
-      .collection<Omit<UserProfile, "id">>("UserProfile")
+      .collection<Omit<IUserProfile, "id">>("UserProfile")
       .findOne({ _id: new ObjectId(userProfileId) });
 
     const findEvent = await this.searchEventRepository({
