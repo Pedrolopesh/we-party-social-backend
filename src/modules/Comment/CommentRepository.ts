@@ -87,11 +87,13 @@ export class CommentRepository implements ICommentRepository {
   }
 
   async updateCommentRepository(params: Partial<IComment>): Promise<IComment> {
+    const { id, ...updatedParams } = params;
+
     const updatedComment = await MongoClient.db
       .collection<Omit<IComment, "id">>("Comment")
       .findOneAndUpdate(
-        { _id: new ObjectId(params.id) },
-        { $set: params },
+        { _id: new ObjectId(id) },
+        { $set: updatedParams },
         { returnDocument: "after" }
       );
 

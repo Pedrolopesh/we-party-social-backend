@@ -4,6 +4,7 @@ import routesUserProfile from "../modules/UserProfile/routesUserProfile";
 import interestRoutes from "../modules/Interest/InterestRoutes";
 import eventRoutes from "../modules/Event/EventRoutes";
 import commentRoutes from "../modules/Comment/CommentRoutes";
+import LikeRoutes from "../modules/Like/LikeRoutes";
 
 const router = express.Router();
 
@@ -21,5 +22,6 @@ router.use("/userprofile", routesUserProfile);
 router.use("/interest", interestRoutes);
 router.use("/event", eventRoutes);
 router.use("/comment", commentRoutes);
+router.use("/like", LikeRoutes);
 
 export default router;
