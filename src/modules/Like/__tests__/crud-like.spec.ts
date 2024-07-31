@@ -1,5 +1,6 @@
 import axios from "axios";
 
+// Run all tests in this file with:
 // npx jest src/modules/Like/__tests__/crud-like.spec.ts
 
 describe("CRUD Like", () => {
@@ -8,7 +9,7 @@ describe("CRUD Like", () => {
 
   const emailTesting = "user28@gmail.com";
   const port = "8081";
-  const interesNameTesting = "Eletro Rits 3";
+
   const eventIdTesting = "66a1529111bf26068696dffb";
   const commentIdTesting = "";
 
@@ -128,7 +129,7 @@ describe("CRUD Like", () => {
       });
   });
 
-  it.skip("should return 200 OK for valid flow: delete userProfile like in event", async () => {
+  it.skip("should return 200 OK for valid flow: delete like in event", async () => {
     const authHeaders = {
       Authorization: `Bearer ${token}`,
       userprofileid: `${userProfileId}`,
@@ -185,6 +186,4 @@ describe("CRUD Like", () => {
         throw new Error("Error creating interest");
       });
   });
-
-  // Adicione mais testes para os outros endpoints CRUD aqui...
 });

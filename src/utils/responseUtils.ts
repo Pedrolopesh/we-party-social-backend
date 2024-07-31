@@ -8,7 +8,7 @@ export const sendSuccessResponse = (
 ) => {
   res.status(status).json({
     status,
-    data,
+    ...data,
   });
 };
 

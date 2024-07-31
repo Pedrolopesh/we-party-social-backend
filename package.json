@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "nodemon",
     "test": "jest",
-    "test:watch": "jest --watch"
+    "test:watch": "jest --watch",
+    "test:userProfile": "npx jest src/modules/UserProfile/__tests__/userProfileIntegration.spec.ts",
+    "test:userProfileService": "npx jest src/modules/UserProfile/__tests__/userProfileService.test.ts"
   },
   "keywords": [],
   "author": "",

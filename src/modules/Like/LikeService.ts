@@ -90,7 +90,7 @@ export class LikeService implements ILikeService {
       throw new Error("Like not found");
     }
 
-    const updatedEvent = await this.eventRepository.deleteLikeEventRepository({
+    await this.eventRepository.deleteLikeEventRepository({
       id: deleteEventLikeParams.eventLikedId,
       eventLike: findLike.id,
     });
@@ -98,10 +98,6 @@ export class LikeService implements ILikeService {
     const deletedLike = await this.likeRepository.deleteLikeRepository(
       findLike.id
     );
-
-    console.log("deletedLike: ", deletedLike, updatedEvent);
-
-    // deletedLike?.eventLikedId = updatedEvent.id;
 
     return deletedLike;
   }
