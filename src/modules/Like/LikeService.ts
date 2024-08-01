@@ -1,4 +1,5 @@
 import {
+  IDeleteCommentLikeParams,
   IDeleteEventLikeParams,
   ILike,
   ILikeRepository,
@@ -77,14 +78,10 @@ export class LikeService implements ILikeService {
   async deleteEventLikeService(
     deleteEventLikeParams: IDeleteEventLikeParams
   ): Promise<ILike | null> {
-    console.log("deleteEventLikeParams: ", deleteEventLikeParams);
-
     const [findLike] = await this.likeRepository.searchLikeRepository({
       eventLikedId: deleteEventLikeParams.eventLikedId,
       userProfileId: deleteEventLikeParams.userProfileId,
     });
-
-    console.log("findLike: ", findLike);
 
     if (!findLike) {
       throw new Error("Like not found");
@@ -102,14 +99,26 @@ export class LikeService implements ILikeService {
     return deletedLike;
   }
 
-  async deleteCommentLikeService(id: string): Promise<ILike | null> {
-    const findLike = await this.likeRepository.searchLikeByIdRepository(id);
+  async deleteCommentLikeService(
+    deleteEventLikeParams: IDeleteCommentLikeParams
+  ): Promise<ILike | null> {
+    const [findLike] = await this.likeRepository.searchLikeRepository({
+      commentLikedId: deleteEventLikeParams.commentLikedId,
+      userProfileId: deleteEventLikeParams.userProfileId,
+    });
 
     if (!findLike) {
       throw new Error("Like not found");
     }
 
-    const deletedLike = await this.likeRepository.deleteLikeRepository(id);
+    await this.commentRepository.deleteLikeCommentRepository({
+      id: deleteEventLikeParams.commentLikedId,
+      commentLike: findLike.id,
+    });
+
+    const deletedLike = await this.likeRepository.deleteLikeRepository(
+      findLike.id
+    );
 
     return deletedLike;
   }

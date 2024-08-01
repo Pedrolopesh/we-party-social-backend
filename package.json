@@ -7,6 +7,7 @@
     "dev": "nodemon",
     "test": "jest",
     "test:watch": "jest --watch",
+    "test:likeIntegration": "npx jest src/modules/Like/__tests__/crud-like.spec.ts",
     "test:userProfile": "npx jest src/modules/UserProfile/__tests__/userProfileIntegration.spec.ts",
     "test:userProfileService": "npx jest src/modules/UserProfile/__tests__/userProfileService.test.ts"
   },

@@ -70,7 +70,6 @@ export class LikeRepository implements ILikeRepository {
   }
 
   async searchLikeRepository(querys: ISearchLikeQuerys): Promise<ILike[]> {
-    console.log("querys: ", querys);
     const foundedLikes = await MongoClient.db
       .collection<Omit<ILike, "id">>("Like")
       .find({

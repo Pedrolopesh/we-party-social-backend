@@ -26,6 +26,11 @@ export interface IDeleteEventLikeParams {
   userProfileId: string;
 }
 
+export interface IDeleteCommentLikeParams {
+  commentLikedId: string;
+  userProfileId: string;
+}
+
 // Interface para o controlador de Like
 export interface ILikeController {
   likeEvent(req: Request, res: Response): Promise<void>;
@@ -47,7 +52,9 @@ export interface ILikeService {
 
   deleteEventLikeService(like: IDeleteEventLikeParams): Promise<ILike | null>;
 
-  deleteCommentLikeService(id: string): Promise<ILike | null>;
+  deleteCommentLikeService(
+    like: IDeleteCommentLikeParams
+  ): Promise<ILike | null>;
 
   searchLikeService(querys: ISearchLikeQuerys): Promise<ILike[]>;
 }

@@ -11,7 +11,7 @@ describe("CRUD Like", () => {
   const port = "8081";
 
   const eventIdTesting = "66a1529111bf26068696dffb";
-  const commentIdTesting = "";
+  const commentIdTesting = "66a7e34a0ad0a0cc9429f280";
 
   it("should return 200 OK for valid credentials", async () => {
     const body = {
@@ -25,47 +25,18 @@ describe("CRUD Like", () => {
         body
       );
 
-      token = res.data.data.response.token;
-      userProfileId = res.data.data.response.userProfileId;
+      console.log("res: ", res.data);
 
-      expect(res.data.data.status).toBe(200);
-      expect(res.data.data.response).toHaveProperty("token");
-      expect(res.data.data.response).toHaveProperty("userProfileId");
+      token = res.data.response.token;
+      userProfileId = res.data.response.userProfileId;
+
+      expect(res.data.status).toBe(200);
+      expect(res.data.response).toHaveProperty("token");
+      expect(res.data.response).toHaveProperty("userProfileId");
     } catch (error: any) {
       console.log("Error logging in:", error);
       throw new Error("Error logging in");
     }
-  });
-
-  it.skip("should return 200 OK for valid flow: like comment", async () => {
-    const body = {
-      userProfileId,
-      likeType: "like",
-      commentLikedId: "66a7e34a0ad0a0cc9429f280",
-    };
-
-    const authHeaders = {
-      Authorization: `Bearer ${token}`,
-      userprofileid: `${userProfileId}`,
-    };
-
-    await axios
-      .post(`http://localhost:${port}/api/like/comment`, body, {
-        headers: authHeaders,
-      })
-      .then((res) => {
-        console.log("res: ", res.data);
-
-        userProfileId = res.data.id;
-
-        expect(res.status).toBe(201);
-        expect(res.data.data).toHaveProperty("id");
-      })
-      .catch((error: any) => {
-        console.log("Error interest:", error.response.data);
-        // console.log("Error interest:", error.response.data);
-        throw new Error("Error creating interest");
-      });
   });
 
   it.skip("should return 200 OK for valid flow: delete userProfile like in comment", async () => {
@@ -158,6 +129,67 @@ describe("CRUD Like", () => {
   });
 
   // === Event Like Methods Testing ===
+
+  // === Comment Like Methods Testing ===
+
+  it.skip("should return 200 OK for valid flow: like comment", async () => {
+    const body = {
+      userProfileId,
+      likeType: "like",
+      commentLikedId: "66a7e34a0ad0a0cc9429f280",
+    };
+
+    const authHeaders = {
+      Authorization: `Bearer ${token}`,
+      userprofileid: `${userProfileId}`,
+    };
+
+    await axios
+      .post(`http://localhost:${port}/api/like/comment`, body, {
+        headers: authHeaders,
+      })
+      .then((res) => {
+        console.log("res: ", res.data);
+
+        userProfileId = res.data.id;
+
+        expect(res.status).toBe(201);
+        expect(res.data.data).toHaveProperty("id");
+      })
+      .catch((error: any) => {
+        console.log("Error interest:", error.response.data);
+        // console.log("Error interest:", error.response.data);
+        throw new Error("Error creating interest");
+      });
+  });
+
+  it("should return 200 OK for valid flow: delete like in comment", async () => {
+    const authHeaders = {
+      Authorization: `Bearer ${token}`,
+      userprofileid: `${userProfileId}`,
+    };
+
+    await axios
+      .delete(
+        `http://localhost:${port}/api/like/delete/comment/${commentIdTesting}`,
+        {
+          headers: authHeaders,
+        }
+      )
+      .then((res) => {
+        console.log("res: ", res.data);
+
+        expect(res.data.status).toBe(200);
+        expect(res.data).toHaveProperty("id");
+      })
+      .catch((error: any) => {
+        console.log("Error interest:", error);
+
+        throw new Error("Error deleting event like");
+      });
+  });
+
+  // === Comment Like Methods Testing ===
 
   it.skip("should return 200 OK for valid flow: search userProfile like in event", async () => {
     const authHeaders = {

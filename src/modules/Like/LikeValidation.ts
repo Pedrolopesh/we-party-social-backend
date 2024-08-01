@@ -90,6 +90,27 @@ export class LikeValidation {
     next();
   }
 
+  async deleteCommentLikeValidations(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    await param("commentLikedId")
+      .isString()
+      .withMessage("commentLikedId must be a string")
+      .notEmpty()
+      .withMessage("commentLikedId is required")
+      .isLength({ min: 24, max: 24 })
+      .withMessage("commentLikedId must be 24 characters long")
+      .run(req);
+
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+    next();
+  }
+
   async likeSearchParamsValidations(
     req: Request,
     res: Response,

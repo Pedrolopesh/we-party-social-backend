@@ -61,7 +61,7 @@ router
   .delete(
     authMiddleware.validateToken,
     permissionMiddleware.checkPermission.bind(permissionMiddleware),
-    likeValidation.deleteLikeValidations,
+    likeValidation.deleteCommentLikeValidations,
     async (req, res) => await likeController.deleteCommentLike(req, res)
   );
 

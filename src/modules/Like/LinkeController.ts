@@ -80,13 +80,23 @@ export class LikeController implements ILikeController {
         return;
       }
 
-      const like = await this.likeService.deleteCommentLikeService(
-        commentLikedId
-      );
+      const userprofileid = req.headers.userprofileid;
+
+      if (!userprofileid || typeof userprofileid !== "string") {
+        sendErrorResponse(res, "User profile id is required", 400);
+        return;
+      }
+
+      const userProfileId: string = userprofileid;
+
+      const like = await this.likeService.deleteCommentLikeService({
+        commentLikedId,
+        userProfileId,
+      });
 
       sendSuccessResponse(res, like, 200);
-    } catch (error) {
-      sendErrorResponse(res, "Error deleting like", 400);
+    } catch (error: any) {
+      sendErrorResponse(res, error.message || "Error deleting like", 400);
     }
   }
 

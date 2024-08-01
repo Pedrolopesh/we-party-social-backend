@@ -109,6 +109,30 @@ export class CommentRepository implements ICommentRepository {
     };
   }
 
+  async deleteLikeCommentRepository(params: {
+    commentLike: string;
+    id: string;
+  }): Promise<IComment | null> {
+    const updatedEvent = await MongoClient.db
+      .collection<Omit<IComment, "id">>("Comment")
+      .findOneAndUpdate(
+        { _id: new ObjectId(params.id) },
+        { $pull: { commentLikes: params.commentLike } },
+        { returnDocument: "after" }
+      );
+
+    if (!updatedEvent) {
+      return null;
+    }
+
+    const { _id, ...rest } = updatedEvent;
+
+    return {
+      ...rest,
+      id: _id.toHexString(),
+    };
+  }
+
   async likeCommentRepository(
     id: string,
     userProfileId: string

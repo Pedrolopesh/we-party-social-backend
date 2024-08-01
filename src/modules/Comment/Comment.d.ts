@@ -57,4 +57,9 @@ export interface ICommentRepository {
   searchAllCommentsRepository(): Promise<IComment[]>;
 
   searchCommentByIdRepository(id: string): Promise<IComment | null>;
+
+  deleteLikeCommentRepository(params: {
+    commentLike: string;
+    id: string;
+  }): Promise<IComment | null>;
 }

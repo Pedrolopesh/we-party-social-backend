@@ -37,6 +37,7 @@ export class PermissionMiddleware {
           /^\/api\/like\/comment$/,
           /^\/api\/like\/search(\?.*)?$/,
           /^\/api\/like\/delete\/event(\/[a-zA-Z0-9]+)?$/,
+          /^\/api\/like\/delete\/comment(\/[a-zA-Z0-9]+)?$/,
         ],
         admin: [/^\/userprofile\/all$/],
         promoter: [/^\/userprofile\/all$/],
