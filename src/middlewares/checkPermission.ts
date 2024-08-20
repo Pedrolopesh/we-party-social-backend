@@ -23,6 +23,7 @@ export class PermissionMiddleware {
           /^\/api\/userprofile\/all$/,
           /^\/api\/userprofile\/follow$/,
           /^\/api\/userprofile\/add\/interest$/,
+          /^\/api\/userprofile\/delete(\/[a-zA-Z0-9]+)?$/,
           /^\/api\/interest\/create$/,
           /^\/api\/interest\/update(\/[a-zA-Z0-9]+)?$/,
           /^\/api\/interest\/search(\?.*)?$/,

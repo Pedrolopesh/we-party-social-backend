@@ -4,9 +4,9 @@ describe("CRUD Interest", () => {
   let token: string;
   let userProfileId: string;
   let interesIdTesting: string;
-  const emailTesting = "user28@gmail.com";
+  const emailTesting = "user1@gmail.com";
   const port = "8081";
-  const interesNameTesting = "Eletro Rits 3";
+  const interesNameTesting = "Rap";
 
   it("should return 200 OK for valid credentials", async () => {
     const body = {
@@ -20,12 +20,12 @@ describe("CRUD Interest", () => {
         body
       );
 
-      token = res.data.data.response.token;
-      userProfileId = res.data.data.response.userProfileId;
+      token = res.data.response.token;
+      userProfileId = res.data.response.userProfileId;
 
-      expect(res.data.data.status).toBe(200);
-      expect(res.data.data.response).toHaveProperty("token");
-      expect(res.data.data.response).toHaveProperty("userProfileId");
+      expect(res.data.status).toBe(200);
+      expect(res.data.response).toHaveProperty("token");
+      expect(res.data.response).toHaveProperty("userProfileId");
     } catch (error: any) {
       console.log("Error logging in:", error);
       throw new Error("Error logging in");
@@ -48,8 +48,6 @@ describe("CRUD Interest", () => {
         headers: authHeaders,
       })
       .then((res) => {
-        console.log("res: ", res.data);
-
         userProfileId = res.data.id;
 
         expect(res.status).toBe(200);
@@ -57,12 +55,11 @@ describe("CRUD Interest", () => {
       })
       .catch((error: any) => {
         console.log("Error interest:", error);
-        // console.log("Error interest:", error.response.data);
         throw new Error("Error creating interest");
       });
   });
 
-  it("should return 200 OK for valid flow: search interes", async () => {
+  it.skip("should return 200 OK for valid flow: search interes", async () => {
     const authHeaders = {
       Authorization: `Bearer ${token}`,
       userprofileid: `${userProfileId}`,

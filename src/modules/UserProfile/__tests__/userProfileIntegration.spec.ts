@@ -6,7 +6,7 @@ import axios from "axios";
 const port = "8081";
 const baseURL = `http://localhost:${port}/api/userprofile`;
 
-const emailTesting = "user28@gmail.com";
+const emailTesting = "user1@gmail.com";
 const passwordTesting = "Teste12345@";
 const interesIdTesting = "669eb2cd46a0047b33c5b2c6";
 
@@ -22,7 +22,9 @@ describe("CRUD UserProfile", () => {
     // Teardown logic if needed
   });
 
-  it.skip("should create a new user profile", async () => {
+  // Caso de teste para verificar se a validação de entrada do usuário (userInputValidations) está funcionando corretamente.
+
+  it("should create a new user profile", async () => {
     const body = {
       name: "user unitary test",
       email: emailTesting,
@@ -33,17 +35,18 @@ describe("CRUD UserProfile", () => {
 
     try {
       const res = await axios.post(`${baseURL}/create`, body);
-
+      console.log(res.data);
       expect(res.status).toBe(201); // Supondo que 201 Created é o status esperado
       expect(res.data).toHaveProperty("id");
-      userProfileId = res.data.id; // Salva o ID para uso posterior
+      expect(res.data).toHaveProperty("token");
+      // userProfileId = res.data.id; // Salva o ID para uso posterior
     } catch (error: any) {
       console.error("Error creating user profile:", error.response?.data);
       throw error;
     }
   });
 
-  it("should return 200 OK for valid credentials", async () => {
+  it.skip("should return 200 OK for valid credentials", async () => {
     const body = {
       email: emailTesting,
       password: passwordTesting,

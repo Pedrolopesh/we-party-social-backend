@@ -1,15 +1,15 @@
 import axios from "axios";
-import { IUserProfile } from "../modules/UserProfile/UserProfile";
+// import { IUserProfile } from "../modules/UserProfile/UserProfile";
 
 export const removeMassiveUsers = async () => {
   try {
-    const users = await axios.get("http://localhost:8002/api/userprofile/all");
+    const users: any = []
 
-    const usersIds = users.data.map((user: IUserProfile) => user.id);
+    const usersIds = users.map((user: any) => user.id);
 
     usersIds.forEach(async (id: string) => {
       await axios
-        .delete(`http://localhost:8002/api/userprofile/delete/${id}`)
+        .delete(`http://localhost:8001/api/userprofile/delete/${id}`)
         .then((res) => {
           console.log(res.data);
         })

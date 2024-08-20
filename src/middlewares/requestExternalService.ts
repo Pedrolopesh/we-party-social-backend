@@ -13,7 +13,7 @@ export const requestCreateExternalUser = async (
   params: ICreateExternalUserParams
 ): Promise<ICreatedExternalUser> => {
   try {
-    const { data, status } = await axios.post(
+    const { data } = await axios.post(
       `http://localhost:${port}/api/users/create`,
       params
     );

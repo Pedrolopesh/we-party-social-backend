@@ -14,9 +14,9 @@ import { UserProfileService } from "./userProfileService";
 
 const authMiddleware = new AuthMiddleware();
 const interesntValidation = new InteresntValidation();
+const userProfileValidation = new UserProfileValidation();
 const permissionMiddleware = new PermissionMiddleware();
 
-const userProfileValidation = new UserProfileValidation();
 const userProfileRepository = new UserProfileRepository();
 const interestRepository = new InterestRepository();
 
@@ -63,15 +63,16 @@ router
 router
   .route("/all")
   .get(
-    permissionMiddleware.checkPermission.bind(permissionMiddleware),
-    async (req, res) => {
-      res.status(200).send(" testing ");
-    }
+    // permissionMiddleware.checkPermission.bind(permissionMiddleware),
+    async (req, res) => await userProfileController.searchUserProfile(req, res)
   );
 
 router
   .route("/delete/:id")
   .delete(
+    authMiddleware.validateToken,
+    permissionMiddleware.checkPermission.bind(permissionMiddleware),
+    userProfileValidation.deleteUserInputValidations,
     async (req, res) => await userProfileController.deleteUserProfile(req, res)
   );
 
