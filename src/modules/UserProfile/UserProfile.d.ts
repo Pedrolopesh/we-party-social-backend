@@ -17,13 +17,13 @@ export interface IUserProfile {
 
 export interface CreateUserProfileParams {
   name: string;
-  username: string;
+  username?: string;
   email: string;
-  phone: string;
+  phone?: string;
   password: string;
   acceptedTerms: boolean;
   notificationActive: boolean;
-  document: string;
+  document?: string;
 }
 
 export interface IUpdateUserProfileParams {

@@ -88,17 +88,17 @@ export class UserProfileController implements IUserProfileController {
 
   async deleteUserProfile(req: Request, res: Response): Promise<void> {
     try {
-      const { body } = req;
+      const { params } = req;
 
-      if (!body) {
-        sendErrorResponse(res, "Body is required", 400);
+      if (!params) {
+        sendErrorResponse(res, "params is required", 400);
       }
 
-      if (!body?.id) {
+      if (!params?.id) {
         sendErrorResponse(res, "Id is required", 400);
       }
 
-      const result = await this.userProfileService.deleteUserProfile(req.body);
+      const result = await this.userProfileService.deleteUserProfile(req.params.id);
       sendSuccessResponse(res, result, 201);
     } catch (error: any) {
       sendErrorResponse(res, error.message, 500);

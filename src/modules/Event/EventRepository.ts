@@ -32,11 +32,13 @@ export class EventRepository implements IEventRepository {
   }
 
   async updateEventRepository(params: Partial<IEvent>): Promise<IEvent> {
+    const { id, ...eventUpdatedParams } = params;
+
     const updatedEvent = await MongoClient.db
       .collection<Omit<IEvent, "id">>("Event")
       .findOneAndUpdate(
-        { _id: new ObjectId(params.id) },
-        { $set: params },
+        { _id: new ObjectId(id) },
+        { $set: eventUpdatedParams },
         { returnDocument: "after" }
       );
 
@@ -193,6 +195,30 @@ export class EventRepository implements IEventRepository {
       .findOneAndUpdate(
         { _id: new ObjectId(params.eventId) },
         { $pull: { comments: params.commentId } },
+        { returnDocument: "after" }
+      );
+
+    if (!updatedEvent) {
+      return null;
+    }
+
+    const { _id, ...rest } = updatedEvent;
+
+    return {
+      ...rest,
+      id: _id.toHexString(),
+    };
+  }
+
+  async deleteLikeEventRepository(params: {
+    id: string;
+    eventLike: string;
+  }): Promise<IEvent | null> {
+    const updatedEvent = await MongoClient.db
+      .collection<Omit<IEvent, "id">>("Event")
+      .findOneAndUpdate(
+        { _id: new ObjectId(params.id) },
+        { $pull: { eventLike: params.eventLike } },
         { returnDocument: "after" }
       );
 

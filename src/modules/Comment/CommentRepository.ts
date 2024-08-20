@@ -87,11 +87,13 @@ export class CommentRepository implements ICommentRepository {
   }
 
   async updateCommentRepository(params: Partial<IComment>): Promise<IComment> {
+    const { id, ...updatedParams } = params;
+
     const updatedComment = await MongoClient.db
       .collection<Omit<IComment, "id">>("Comment")
       .findOneAndUpdate(
-        { _id: new ObjectId(params.id) },
-        { $set: params },
+        { _id: new ObjectId(id) },
+        { $set: updatedParams },
         { returnDocument: "after" }
       );
 
@@ -100,6 +102,30 @@ export class CommentRepository implements ICommentRepository {
     }
 
     const { _id, ...rest } = updatedComment;
+
+    return {
+      ...rest,
+      id: _id.toHexString(),
+    };
+  }
+
+  async deleteLikeCommentRepository(params: {
+    commentLike: string;
+    id: string;
+  }): Promise<IComment | null> {
+    const updatedEvent = await MongoClient.db
+      .collection<Omit<IComment, "id">>("Comment")
+      .findOneAndUpdate(
+        { _id: new ObjectId(params.id) },
+        { $pull: { commentLikes: params.commentLike } },
+        { returnDocument: "after" }
+      );
+
+    if (!updatedEvent) {
+      return null;
+    }
+
+    const { _id, ...rest } = updatedEvent;
 
     return {
       ...rest,

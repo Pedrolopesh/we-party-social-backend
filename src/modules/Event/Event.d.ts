@@ -81,6 +81,11 @@ export interface IEventRepository {
   ): Promise<IEvent | null>;
 
   removeCommentInEvent(params: IRemoveCommentInEvent): Promise<IEvent | null>;
+
+  deleteLikeEventRepository(params: {
+    eventLike: string;
+    id: string;
+  }): Promise<IEvent | null>;
 }
 
 export interface IEventService {

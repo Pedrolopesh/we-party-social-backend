@@ -6,7 +6,11 @@
   "scripts": {
     "dev": "nodemon",
     "test": "jest",
-    "test:watch": "jest --watch"
+    "test:watch": "jest --watch",
+    "test:likeIntegration": "npx jest src/modules/Like/__tests__/crud-like.spec.ts",
+    "test:userProfile": "npx jest src/modules/UserProfile/__tests__/userProfileIntegration.spec.ts",
+    "test:interest": "npx jest src/modules/Interest/__tests__/InterestIntegration.spec.ts",
+    "test:userProfileService": "npx jest src/modules/UserProfile/__tests__/userProfileService.test.ts"
   },
   "keywords": [],
   "author": "",

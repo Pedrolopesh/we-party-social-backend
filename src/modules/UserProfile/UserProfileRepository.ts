@@ -34,8 +34,8 @@ export class UserProfileRepository implements IUserProfileRepository {
 
   async findUserProfileByEmail(email: string): Promise<IUserProfile | null> {
     const userProfile = await MongoClient.db
-      .collection<Omit<IUserProfile, "id">>("UserProfile")
-      .findOne({ email });
+    .collection<Omit<IUserProfile, "id">>("UserProfile")
+    .findOne({ email });
 
     if (!userProfile) {
       return null;
@@ -62,13 +62,11 @@ export class UserProfileRepository implements IUserProfileRepository {
     };
   }
 
-  async getUserProfiles(
-    params?: IUserProfileSearchParams | undefined
-  ): Promise<IUserProfile[]> {
+  async getUserProfiles(): Promise<IUserProfile[]> {
     const userProfile = await MongoClient.db
-      .collection<Omit<IUserProfile, "id">>("UserProfile")
-      .find({})
-      .toArray();
+    .collection<Omit<IUserProfile, "id">>("UserProfile")
+    .find({})
+    .toArray();
 
     return userProfile.map(({ _id, ...rest }) => ({
       ...rest,
@@ -101,28 +99,18 @@ export class UserProfileRepository implements IUserProfileRepository {
   }
 
   async searchUserProfile(
-    params?: IUserProfileSearchParams | undefined
+    params: IUserProfileSearchParams
   ): Promise<IUserProfile[]> {
-    console.log(params);
-
-    if (!params) {
-      const users = await MongoClient.db
-        .collection<Omit<IUserProfile, "id">>("UserProfile")
-        .find({})
-        .toArray();
-
-      return users.map(({ _id, ...rest }) => ({
-        ...rest,
-        id: _id.toHexString(),
-      }));
+    if (Object.keys(params).length === 0) {
+      return await this.getUserProfiles();
     }
 
-    const users = await MongoClient.db
+    const userProfile = await MongoClient.db
       .collection<Omit<IUserProfile, "id">>("UserProfile")
-      .find({})
+      .find(params)
       .toArray();
 
-    return users.map(({ _id, ...rest }) => ({
+    return userProfile.map(({ _id, ...rest }) => ({
       ...rest,
       id: _id.toHexString(),
     }));
