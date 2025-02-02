@@ -1,17 +1,15 @@
 import axios from "axios";
-import { MongoClient } from "../database/mongo";
-import { UserProfile } from "../controllers/UserProfile/UserProfile";
+// import { IUserProfile } from "../modules/UserProfile/UserProfile";
 
 export const removeMassiveUsers = async () => {
   try {
-    const users = await axios.get("http://localhost:8002/api/userprofile/all");
-    console.log("users ?????", users);
+    const users: any = []
 
-    const usersIds = users.data.map((user: UserProfile) => user.id);
+    const usersIds = users.map((user: any) => user.id);
 
     usersIds.forEach(async (id: string) => {
       await axios
-        .delete(`http://localhost:8002/api/userprofile/delete/${id}`)
+        .delete(`http://localhost:8001/api/userprofile/delete/${id}`)
         .then((res) => {
           console.log(res.data);
         })

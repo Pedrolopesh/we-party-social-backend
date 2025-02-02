@@ -1,8 +1,16 @@
 import { Request, Response, NextFunction } from "express";
-import { check, validationResult } from "express-validator";
+import { check, param, validationResult } from "express-validator";
 
 export class UserProfileValidation {
   async userInputValidations(req: Request, res: Response, next: NextFunction) {
+    if (typeof req.body.acceptedTerms === "string") {
+      return res.status(400).json({ errors: "Accepted terms must be boolean" });
+    }
+
+    if (typeof req.body.notificationActive === "string") {
+      return res.status(400).json({ errors: "Accepted terms must be boolean" });
+    }
+
     await check("email", "Email is required").isEmail().run(req);
     await check("password", "Password is required")
       .isLength({ min: 8 })
@@ -20,12 +28,24 @@ export class UserProfileValidation {
       .isBoolean()
       .withMessage("Accepted terms must be true or false")
       .equals("true")
+      .toBoolean()
       .withMessage("You must accept the terms")
       .run(req);
     await check("notificationActive", "notificationActive is required")
       .isBoolean()
       .withMessage("Accepted terms must be true or false")
+      .toBoolean()
       .run(req);
+
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+    next();
+  }
+
+  async deleteUserInputValidations(req: Request, res: Response, next: NextFunction) {
+    await param("id", "Id is required").isString().notEmpty().run(req);
 
     const errors = validationResult(req);
     if (!errors.isEmpty()) {

@@ -7,6 +7,9 @@ import cors from "cors";
 import { MongoClient } from "./database/mongo";
 import { config } from "dotenv";
 import routes from "./routes";
+import loggerMiddleware from "./middlewares/loggerMiddleware";
+
+const app = express();
 
 const main = async () => {
   config();
@@ -23,6 +26,7 @@ const main = async () => {
   app.use(compression());
   app.use(cookieParser());
   app.use(bodyParser.json());
+  app.use(loggerMiddleware);
   app.use("/api", routes);
 
   const server = http.createServer(app);
@@ -41,3 +45,5 @@ const main = async () => {
 };
 
 main();
+
+export { app };

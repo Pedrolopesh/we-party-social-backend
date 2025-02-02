@@ -1,4 +1,4 @@
-import { UserProfileRepository } from "../controllers/UserProfile/UserProfileRepository";
+import { UserProfileRepository } from "../modules/UserProfile/UserProfileRepository";
 import { Request, Response, NextFunction } from "express";
 import { requestCheckUserProfileRole } from "./requestExternalService";
 
@@ -23,10 +23,22 @@ export class PermissionMiddleware {
           /^\/api\/userprofile\/all$/,
           /^\/api\/userprofile\/follow$/,
           /^\/api\/userprofile\/add\/interest$/,
+          /^\/api\/userprofile\/delete(\/[a-zA-Z0-9]+)?$/,
           /^\/api\/interest\/create$/,
           /^\/api\/interest\/update(\/[a-zA-Z0-9]+)?$/,
           /^\/api\/interest\/search(\?.*)?$/,
           /^\/api\/interest\/delete(\/[a-zA-Z0-9]+)?$/,
+          /^\/api\/event\/create$/,
+          /^\/api\/event\/update$/,
+          /^\/api\/comment\/create$/,
+          /^\/api\/comment\/update$/,
+          /^\/api\/comment\/delete(\/[a-zA-Z0-9]+)?$/,
+          /^\/api\/comment\/search(\?.*)?$/,
+          /^\/api\/like\/event$/,
+          /^\/api\/like\/comment$/,
+          /^\/api\/like\/search(\?.*)?$/,
+          /^\/api\/like\/delete\/event(\/[a-zA-Z0-9]+)?$/,
+          /^\/api\/like\/delete\/comment(\/[a-zA-Z0-9]+)?$/,
         ],
         admin: [/^\/userprofile\/all$/],
         promoter: [/^\/userprofile\/all$/],

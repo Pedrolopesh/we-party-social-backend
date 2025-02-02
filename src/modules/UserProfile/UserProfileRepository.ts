@@ -3,21 +3,21 @@ import { MongoClient } from "../../database/mongo";
 import {
   CreateUserProfileParams,
   IUpdateUserProfileParams,
+  IUserProfile,
   IUserProfileRepository,
   IUserProfileSearchParams,
-  UserProfile,
 } from "./UserProfile";
 
 export class UserProfileRepository implements IUserProfileRepository {
   async createUserProfile(
     params: CreateUserProfileParams
-  ): Promise<UserProfile> {
+  ): Promise<IUserProfile> {
     const { insertedId } = await MongoClient.db
       .collection("UserProfile")
       .insertOne(params);
 
     const users = await MongoClient.db
-      .collection<Omit<UserProfile, "id">>("UserProfile")
+      .collection<Omit<IUserProfile, "id">>("UserProfile")
       .findOne({ _id: insertedId });
 
     if (!users) {
@@ -32,10 +32,10 @@ export class UserProfileRepository implements IUserProfileRepository {
     };
   }
 
-  async findUserProfileByEmail(email: string): Promise<UserProfile | null> {
+  async findUserProfileByEmail(email: string): Promise<IUserProfile | null> {
     const userProfile = await MongoClient.db
-      .collection<Omit<UserProfile, "id">>("UserProfile")
-      .findOne({ email });
+    .collection<Omit<IUserProfile, "id">>("UserProfile")
+    .findOne({ email });
 
     if (!userProfile) {
       return null;
@@ -47,9 +47,9 @@ export class UserProfileRepository implements IUserProfileRepository {
     };
   }
 
-  async findUserProfileById(id: string): Promise<UserProfile | null> {
+  async findUserProfileById(id: string): Promise<IUserProfile | null> {
     const userProfile = await MongoClient.db
-      .collection<Omit<UserProfile, "id">>("UserProfile")
+      .collection<Omit<IUserProfile, "id">>("UserProfile")
       .findOne({ _id: new ObjectId(id) });
 
     if (!userProfile) {
@@ -62,13 +62,11 @@ export class UserProfileRepository implements IUserProfileRepository {
     };
   }
 
-  async getUserProfiles(
-    params?: IUserProfileSearchParams | undefined
-  ): Promise<UserProfile[]> {
+  async getUserProfiles(): Promise<IUserProfile[]> {
     const userProfile = await MongoClient.db
-      .collection<Omit<UserProfile, "id">>("UserProfile")
-      .find({})
-      .toArray();
+    .collection<Omit<IUserProfile, "id">>("UserProfile")
+    .find({})
+    .toArray();
 
     return userProfile.map(({ _id, ...rest }) => ({
       ...rest,
@@ -79,9 +77,9 @@ export class UserProfileRepository implements IUserProfileRepository {
   async updateUserProfile(
     id: string,
     params: Partial<IUpdateUserProfileParams>
-  ): Promise<UserProfile> {
+  ): Promise<IUserProfile> {
     const updatedUserProfile = await MongoClient.db
-      .collection<Omit<UserProfile, "id">>("UserProfile")
+      .collection<Omit<IUserProfile, "id">>("UserProfile")
       .findOneAndUpdate(
         { _id: new ObjectId(id) },
         { $set: params },
@@ -100,9 +98,27 @@ export class UserProfileRepository implements IUserProfileRepository {
     };
   }
 
-  async deleteUserProfile(id: string): Promise<UserProfile | null> {
+  async searchUserProfile(
+    params: IUserProfileSearchParams
+  ): Promise<IUserProfile[]> {
+    if (Object.keys(params).length === 0) {
+      return await this.getUserProfiles();
+    }
+
     const userProfile = await MongoClient.db
-      .collection<Omit<UserProfile, "id">>("UserProfile")
+      .collection<Omit<IUserProfile, "id">>("UserProfile")
+      .find(params)
+      .toArray();
+
+    return userProfile.map(({ _id, ...rest }) => ({
+      ...rest,
+      id: _id.toHexString(),
+    }));
+  }
+
+  async deleteUserProfile(id: string): Promise<IUserProfile | null> {
+    const userProfile = await MongoClient.db
+      .collection<Omit<IUserProfile, "id">>("UserProfile")
       .findOneAndDelete({ _id: new ObjectId(id) });
 
     if (!userProfile) {
@@ -117,9 +133,9 @@ export class UserProfileRepository implements IUserProfileRepository {
     };
   }
 
-  async getAllUserProfiles(): Promise<UserProfile[]> {
+  async getAllUserProfiles(): Promise<IUserProfile[]> {
     const users = await MongoClient.db
-      .collection<Omit<UserProfile, "id">>("UserProfile")
+      .collection<Omit<IUserProfile, "id">>("UserProfile")
       .find({})
       .toArray();
 
@@ -132,13 +148,15 @@ export class UserProfileRepository implements IUserProfileRepository {
   async addInterestToUserProfile(
     userProfileId: string,
     interestId: string
-  ): Promise<UserProfile | null> {
+  ): Promise<IUserProfile | null> {
     const userProfile = await this.findUserProfileById(userProfileId);
     if (!userProfile) {
       return null;
     }
 
     const hasInterests = userProfile?.interest;
+
+    // TODO: it's necessary check if interest exists before add to user profile
 
     const isFollowing = !!hasInterests
       ? userProfile.interest.some((follow: string) => follow === interestId)
@@ -147,7 +165,7 @@ export class UserProfileRepository implements IUserProfileRepository {
     if (isFollowing) {
       // Se estiver seguindo, remove o usuário da lista de following
       const updatedUserProfile = await MongoClient.db
-        .collection<Omit<UserProfile, "id">>("UserProfile")
+        .collection<Omit<IUserProfile, "id">>("UserProfile")
         .findOneAndUpdate(
           { _id: new ObjectId(userProfileId) },
           { $pull: { interest: interestId } },
@@ -167,7 +185,7 @@ export class UserProfileRepository implements IUserProfileRepository {
     } else {
       // Se não estiver seguindo, adiciona o usuário à lista de following
       const updatedUserProfile = await MongoClient.db
-        .collection<Omit<UserProfile, "id">>("UserProfile")
+        .collection<Omit<IUserProfile, "id">>("UserProfile")
         .findOneAndUpdate(
           { _id: new ObjectId(userProfileId) },
           { $addToSet: { interest: interestId } },
@@ -189,7 +207,7 @@ export class UserProfileRepository implements IUserProfileRepository {
   async followUserProfile(
     userProfileId: string,
     friendUserProfileId: string
-  ): Promise<UserProfile | null> {
+  ): Promise<IUserProfile | null> {
     const friendId = friendUserProfileId;
 
     const userProfile = await this.findUserProfileById(userProfileId);
@@ -206,7 +224,7 @@ export class UserProfileRepository implements IUserProfileRepository {
     if (isFollowing) {
       // Se estiver seguindo, remove o usuário da lista de following
       const updatedUserProfile = await MongoClient.db
-        .collection<Omit<UserProfile, "id">>("UserProfile")
+        .collection<Omit<IUserProfile, "id">>("UserProfile")
         .findOneAndUpdate(
           { _id: new ObjectId(userProfileId) },
           { $pull: { following: friendId } },
@@ -226,7 +244,7 @@ export class UserProfileRepository implements IUserProfileRepository {
     } else {
       // Se não estiver seguindo, adiciona o usuário à lista de following
       const updatedUserProfile = await MongoClient.db
-        .collection<Omit<UserProfile, "id">>("UserProfile")
+        .collection<Omit<IUserProfile, "id">>("UserProfile")
         .findOneAndUpdate(
           { _id: new ObjectId(userProfileId) },
           { $addToSet: { following: friendId } },
